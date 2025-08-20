@@ -1,0 +1,17 @@
+asgiref
+black
+click
+colorama
+Django
+djangorestframework
+flake8
+mccabe
+mypy_extensions
+packaging
+pathspec
+platformdirs
+pycodestyle
+pyflakes
+python-dotenv
+sqlparse
+tzdata
