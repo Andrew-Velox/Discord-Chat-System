@@ -11,13 +11,16 @@ from .serializer import ServerSerializer
 
 from.schema import server_list_docs
 
+from rest_framework.permissions import IsAuthenticated
+
 
 class ServerListViewSet(viewsets.ViewSet):
     
     queryset = Server.objects.all()
 
-    @server_list_docs
+    permission_classes= [IsAuthenticated]
 
+    @server_list_docs
     def list(self, request):
 
         """Returns a list of servers filtered by various parameters.
