@@ -25,7 +25,16 @@ export function useAuthService(): AuthServiceProps {
                 localStorage.setItem("user_id", response.data.user_id);
             }
             return true;
-        } catch (error) {
+        } catch (error: any) {
+            // If the endpoint doesn't exist (404) or is unauthorized (401)
+            // Fall back to localStorage check for now
+            if (error.response?.status === 404) {
+                console.log("Auth verification endpoint not available, falling back to localStorage");
+                const localStorageAuth = localStorage.getItem("isLoggedIn") === "true";
+                setIsLoggedIn(localStorageAuth);
+                return localStorageAuth;
+            }
+            
             setIsLoggedIn(false);
             localStorage.setItem("isLoggedIn", "false");
             return false;
@@ -50,9 +59,6 @@ export function useAuthService(): AuthServiceProps {
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("user_id", response.data.user_id);
             setIsLoggedIn(true);
-            
-            // Re-check auth status to ensure consistency
-            await checkAuthStatus();
             
             return 200;
         } catch (err: any) {
