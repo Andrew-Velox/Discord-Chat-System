@@ -33,3 +33,4 @@ uritemplate
 uvicorn
 watchfiles
 websockets
+djangorestframework-simplejwt
