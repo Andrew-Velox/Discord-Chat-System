@@ -153,6 +153,24 @@ CORS_ALLOWED_ORIGINS = [
     "https://discord-chat-system.vercel.app",
 ]
 
+# Additional CORS settings for production
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'x-csrftoken',
+]
+
 
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
@@ -165,6 +183,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
     "JWT_COOKIE_SAMESITE": "Lax",
-    "JWT_COOKIE_SECURE": False,  # False for development HTTP
+    "JWT_COOKIE_SECURE": True,  # True for production HTTPS
     "JWT_COOKIE_HTTPONLY": True,
 }
