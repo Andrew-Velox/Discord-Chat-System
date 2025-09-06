@@ -17,21 +17,22 @@ export function useAuthService(): AuthServiceProps {
         
         // First check localStorage for quick initial state
         const localStorageAuth = localStorage.getItem("isLoggedIn") === "true";
+        const storedUserId = localStorage.getItem("user_id");
         
         // If we have no local storage indication of being logged in, don't bother checking server
-        if (!localStorageAuth) {
+        if (!localStorageAuth || !storedUserId) {
             setIsLoggedIn(false);
             setIsLoading(false);
             return false;
         }
         
         try {
-            // Try to verify with the server if the endpoint exists
+            // Try to verify with the server
             const response = await axios.get(
                 `${BASE_URL}/api/auth/verify/`,
                 { 
                     withCredentials: true,
-                    timeout: 5000 // 5 second timeout
+                    timeout: 10000 // 10 second timeout
                 }
             );
             
@@ -44,14 +45,16 @@ export function useAuthService(): AuthServiceProps {
             if (response.data.username) {
                 localStorage.setItem("username", response.data.username);
             }
+            console.log("Authentication verified with server");
             return true;
         } catch (error: any) {
-            console.log("Auth verification error:", error.response?.status);
+            console.log("Auth verification error:", error.response?.status || error.message);
             
             // If server is unreachable or has issues, trust localStorage temporarily
-            if (!error.response || error.response?.status >= 500) {
-                console.log("Server error, maintaining login state from localStorage");
+            if (!error.response || error.response?.status >= 500 || error.code === 'ECONNABORTED') {
+                console.log("Server error or timeout, maintaining login state from localStorage");
                 setIsLoggedIn(localStorageAuth);
+                setIsLoading(false);
                 return localStorageAuth;
             }
             
@@ -62,19 +65,29 @@ export function useAuthService(): AuthServiceProps {
                 localStorage.setItem("isLoggedIn", "false");
                 localStorage.removeItem("user_id");
                 localStorage.removeItem("username");
+                setIsLoading(false);
                 return false;
             }
             
-            // For other errors, trust localStorage but try to refresh token
-            console.log("Network or other error, attempting token refresh");
+            // For other errors, try to refresh token once
+            console.log("Attempting token refresh");
             try {
-                await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { withCredentials: true });
+                await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { 
+                    withCredentials: true,
+                    timeout: 5000 
+                });
+                console.log("Token refresh successful");
                 setIsLoggedIn(true);
+                setIsLoading(false);
                 return true;
             } catch (refreshError) {
-                console.log("Token refresh failed, using localStorage state");
-                setIsLoggedIn(localStorageAuth);
-                return localStorageAuth;
+                console.log("Token refresh failed, clearing authentication");
+                setIsLoggedIn(false);
+                localStorage.setItem("isLoggedIn", "false");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("username");
+                setIsLoading(false);
+                return false;
             }
         } finally {
             setIsLoading(false);
@@ -87,6 +100,7 @@ export function useAuthService(): AuthServiceProps {
     }, []);
 
     const login = async (username: string, password: string) => {
+        setIsLoading(true);
         try {
             const response = await axios.post(
                 `${BASE_URL}/api/token/`,
@@ -94,13 +108,11 @@ export function useAuthService(): AuthServiceProps {
                 { withCredentials: true }
             );
             
-            // Store authentication state
+            // Store authentication state immediately
+            setIsLoggedIn(true);
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("user_id", response.data.user_id);
-            if (response.data.username) {
-                localStorage.setItem("username", response.data.username);
-            }
-            setIsLoggedIn(true);
+            localStorage.setItem("username", username); // Store the username from login
             
             console.log("Login successful, user authenticated");
             return 200;
@@ -111,6 +123,8 @@ export function useAuthService(): AuthServiceProps {
             localStorage.removeItem("user_id");
             localStorage.removeItem("username");
             return err.response?.status || 500;
+        } finally {
+            setIsLoading(false);
         }
     };
 
