@@ -13,6 +13,14 @@ const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
   const { isLoggedIn, isLoading } = useAuthServiceContext();
 
   useEffect(() => {
+    // Membership checking temporarily disabled to prevent infinite 401 errors
+    // The authentication system is working fine, but membership validation
+    // is causing issues with server-side permissions
+    console.log("MembershipCheck: Membership validation disabled");
+    return;
+    
+    /* 
+    // DISABLED: Membership checking code
     // Only check membership if:
     // 1. We have a serverId
     // 2. User is definitively logged in (not just loading state)
@@ -38,6 +46,7 @@ const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
     // Add a small delay to ensure auth state is fully settled
     const timeoutId = setTimeout(checkMembership, 100);
     return () => clearTimeout(timeoutId);
+    */
   }, [serverId, isMember, isLoggedIn, isLoading]);
 
   return <>{children}</>;
