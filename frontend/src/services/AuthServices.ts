@@ -28,7 +28,7 @@ export function useAuthService(): AuthServiceProps {
         try {
             // Try to verify with the server if the endpoint exists
             const response = await axios.get(
-                `${BASE_URL}/auth/verify/`,
+                `${BASE_URL}/api/auth/verify/`,
                 { 
                     withCredentials: true,
                     timeout: 5000 // 5 second timeout
@@ -68,7 +68,7 @@ export function useAuthService(): AuthServiceProps {
             // For other errors, trust localStorage but try to refresh token
             console.log("Network or other error, attempting token refresh");
             try {
-                await axios.post(`${BASE_URL}/token/refresh/`, {}, { withCredentials: true });
+                await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { withCredentials: true });
                 setIsLoggedIn(true);
                 return true;
             } catch (refreshError) {
@@ -89,7 +89,7 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         try {
             const response = await axios.post(
-                `${BASE_URL}/token/`,
+                `${BASE_URL}/api/token/`,
                 { username, password },
                 { withCredentials: true }
             );
@@ -117,7 +117,7 @@ export function useAuthService(): AuthServiceProps {
     const register = async (username: string, password: string) => {
         try {
             const response = await axios.post(
-                `${BASE_URL}/register/`,
+                `${BASE_URL}/api/register/`,
                 { username, password },
                 { withCredentials: true }
             );
@@ -139,7 +139,7 @@ export function useAuthService(): AuthServiceProps {
         
         // Call logout endpoint (don't block on errors)
         try {
-            await axios.post(`${BASE_URL}/logout/`, {}, { withCredentials: true });
+            await axios.post(`${BASE_URL}/api/logout/`, {}, { withCredentials: true });
         } catch (error) {
             console.log("Logout endpoint failed, but user is logged out locally");
         }
@@ -147,7 +147,7 @@ export function useAuthService(): AuthServiceProps {
 
     const refreshAccessToken = async () => {
         try {
-            await axios.post(`${BASE_URL}/token/refresh/`, {}, { withCredentials: true });
+            await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { withCredentials: true });
         } catch (refreshError) {
             logout(); // Auto-logout on refresh failure
             throw refreshError;
