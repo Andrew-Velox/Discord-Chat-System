@@ -26,7 +26,7 @@ const ExploreCategories = () => {
   const isDarkMode = theme.palette.mode === "dark";
   const { dataCRUD, fetchData } = useCrud<Category>(
     [],
-    "/server/category/"
+    "/api/server/category/"
   );
 
   useEffect(() => {

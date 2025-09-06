@@ -28,7 +28,7 @@ type Props = {
 const PopularChannels: React.FC<Props> = ({ open }) => {
   const { dataCRUD, fetchData } = usePublicCrud<Server>(
     [],
-    "/server/select/"
+    "/api/server/select/"
   );
 
   useEffect(() => {

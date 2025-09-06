@@ -31,8 +31,8 @@ interface Server {
 const ExploreServers = () => {
   const { categoryName } = useParams();
   const url = categoryName
-    ? `/server/select/?category=${categoryName}`
-    : "/server/select";
+    ? `/api/server/select/?category=${categoryName}`
+    : "/api/server/select";
   
   console.log("ExploreServers: Component rendered with categoryName:", categoryName);
   console.log("ExploreServers: Generated URL:", url);
