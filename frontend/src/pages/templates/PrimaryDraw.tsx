@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, styled } from "@mui/material";
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTheme } from "@mui/material/styles";
 import DrawerToggle from "../../components/PrimaryDraw/DrawToggle";
 import MuiDrawer from "@mui/material/Drawer";
@@ -25,7 +25,7 @@ const PrimaryDraw: React.FC<Props> = ({ children }) => {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: "hidden",
+    overflowX: "hidden" as const,
   });
 
   const closedMixin = () => ({
@@ -33,14 +33,11 @@ const PrimaryDraw: React.FC<Props> = ({ children }) => {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: "hidden",
+    overflowX: "hidden" as const,
     width: theme.primaryDraw.closed,
   });
 
-  const Drawer = styled(
-    MuiDrawer,
-    {}
-  )(({ theme, open }) => ({
+  const Drawer = styled(MuiDrawer)<{open: boolean}>(({ theme, open }) => ({
     width: theme.primaryDraw.width,
     whiteSpace: "nowrap",
     boxSizing: "border-box",

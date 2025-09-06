@@ -7,15 +7,15 @@ import MessageInterface from "../components/Main/MessageInterface";
 import ServerChannels from "../components/SecondaryDraw/ServerChannels";
 import UserServers from "../components/PrimaryDraw/UserServers";
 import { useParams, useNavigate } from "react-router-dom";
-import { Server } from "../@types/server.d";
+import type { Server } from "../@types/server.d";
 import useCrud from "../hooks/useCrud";
 import { useEffect } from "react";
 
-const Server = () => {
+const ServerPage = () => {
   const navigate = useNavigate();
   const { serverId, channelId } = useParams();
 
-  const { dataCRUD, error, isLoading, fetchData } = useCrud<Server>(
+  const { dataCRUD, error, fetchData } = useCrud<Server>(
     [],
     `/server/select/?by_serverid=${serverId}`
   );
@@ -64,4 +64,4 @@ const Server = () => {
     </Box>
   );
 };
-export default Server;
+export default ServerPage;

@@ -9,7 +9,6 @@ import {
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
@@ -40,21 +39,31 @@ const ExploreServers = () => {
   }, [categoryName]);
 
   return (
-    <>
-      <Container maxWidth="lg">
-        <Box sx={{ pt: 6 }}>
+    <Box sx={{ width: '100%', minHeight: '100vh' }}>
+      <Container 
+        maxWidth="lg"
+        sx={{
+          height: { xs: '100vh', sm: 'auto' },
+          overflowY: { xs: 'auto', sm: 'visible' },
+          pb: { xs: 4, sm: 0 },
+          px: { xs: 1, sm: 2, md: 3 },
+          width: '100%',
+          maxWidth: { xs: '100vw', sm: '100%' }
+        }}
+      >
+        <Box sx={{ pt: { xs: 2, sm: 6 } }}>
           <Typography
             variant="h3"
-            noWrap
             component="h1"
             sx={{
-              display: {
-                sm: "block",
-                fontWeight: 700,
-                letterSpacing: "-2px",
-                textTransform: "capitalize",
-              },
+              display: "block",
+              fontWeight: 700,
+              letterSpacing: "-2px",
+              textTransform: "capitalize",
               textAlign: { xs: "center", sm: "left" },
+              fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' },
+              wordWrap: 'break-word',
+              whiteSpace: 'normal'
             }}
           >
             {categoryName ? categoryName : "Popular Channels"}
@@ -63,16 +72,17 @@ const ExploreServers = () => {
         <Box>
           <Typography
             variant="h6"
-            noWrap
             component="h2"
             color="textSecondary"
             sx={{
-              display: {
-                sm: "block",
-                fontWeight: 700,
-                letterSpacing: "-1px",
-              },
+              display: "block",
+              fontWeight: 700,
+              letterSpacing: "-1px",
               textAlign: { xs: "center", sm: "left" },
+              fontSize: { xs: '1rem', sm: '1.25rem' },
+              wordWrap: 'break-word',
+              whiteSpace: 'normal',
+              px: { xs: 1, sm: 0 }
             }}
           >
             {categoryName
@@ -83,13 +93,55 @@ const ExploreServers = () => {
 
         <Typography
           variant="h6"
-          sx={{ pt: 6, pb: 1, fontWeight: 700, letterSpacing: "-1px" }}
+          sx={{ 
+            pt: { xs: 3, sm: 6 }, 
+            pb: 1, 
+            fontWeight: 700, 
+            letterSpacing: "-1px",
+            textAlign: { xs: "center", sm: "left" },
+            fontSize: { xs: '1.1rem', sm: '1.25rem' },
+            px: { xs: 1, sm: 0 }
+          }}
         >
           Recommended Channels
         </Typography>
-        <Grid container spacing={{ xs: 2, sm: 2 }}>
+        <Box 
+          sx={{
+            display: { xs: 'block', sm: 'grid' },
+            gridTemplateColumns: {
+              sm: 'repeat(auto-fit, minmax(300px, 1fr))',
+              md: 'repeat(auto-fit, minmax(320px, 1fr))',
+              lg: 'repeat(4, 1fr)'
+            },
+            gap: { xs: 1, sm: 1.5, md: 2 },
+            maxHeight: { xs: 'calc(100vh - 160px)', sm: 'none' },
+            overflowY: { xs: 'auto', sm: 'visible' },
+            overflowX: { xs: 'hidden', sm: 'visible' },
+            pb: { xs: 2, sm: 0 },
+            px: { xs: 0, sm: 0 },
+            width: '100%',
+            boxSizing: 'border-box',
+            
+            // Mobile: Stack vertically with proper spacing
+            '& > *': {
+              xs: {
+                marginBottom: 1,
+                width: '100%'
+              }
+            }
+          }}
+        >
           {dataCRUD.map((item) => (
-            <Grid item key={item.id} xs={12} sm={6} md={6} lg={3}>
+            <Box 
+              key={item.id}
+              sx={{
+                width: '100%',
+                minWidth: 0,
+                maxWidth: '100%',
+                overflow: 'hidden',
+                mb: { xs: 2, sm: 0 }
+              }}
+            >
               <Card
                 sx={{
                   height: "100%",
@@ -97,8 +149,11 @@ const ExploreServers = () => {
                   flexDirection: "column",
                   boxShadow: "none",
                   backgroundImage: "none",
-                  borderRadius: 0,
-                  mb: { xs: 2, sm: 0 }, // Add margin bottom for mobile
+                  borderRadius: { xs: 1, sm: 0 },
+                  mb: { xs: 1, sm: 0 },
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                  width: '100%'
                 }}
               >
                 <Link
@@ -114,32 +169,41 @@ const ExploreServers = () => {
                     }
                     alt="random"
                     sx={{ 
-                      display: { xs: "none", sm: "block" },
-                      height: 200,
+                      display: { xs: "block", sm: "block" },
+                      height: { xs: 150, sm: 180, md: 200 },
                       width: "100%",
-                      objectFit: 'cover'
+                      objectFit: 'cover',
+                      maxWidth: '100%'
                     }}
                   />
                   <CardContent
                     sx={{
                       flexGrow: 1,
-                      p: { xs: 2, sm: 0 }, // Add padding for mobile
-                      "&:last-child": { paddingBottom: { xs: 2, sm: 0 } },
+                      p: { xs: 1.5, sm: 2 },
+                      "&:last-child": { paddingBottom: { xs: 1.5, sm: 2 } },
                     }}
                   >
-                    <List sx={{ py: { xs: 1, sm: 0 } }}>
+                    <List sx={{ py: { xs: 0.5, sm: 0 } }}>
                       <ListItem 
                         disablePadding={false}
                         sx={{ 
-                          py: { xs: 1, sm: 0 },
-                          px: { xs: 1, sm: 0 }
+                          py: { xs: 0.5, sm: 0 },
+                          px: { xs: 0, sm: 0 },
+                          flexWrap: { xs: 'wrap', sm: 'nowrap' }
                         }}
                       >
-                        <ListItemIcon sx={{ minWidth: 0 }}>
-                          <ListItemAvatar sx={{ minWidth: "50px" }}>
+                        <ListItemIcon sx={{ minWidth: { xs: 35, sm: 40 } }}>
+                          <ListItemAvatar sx={{ 
+                            minWidth: { xs: "35px", sm: "50px" },
+                            mr: { xs: 0.5, sm: 1 }
+                          }}>
                             <Avatar
                               alt="server Icon"
                               src={`${MEDIA_URL}${item.icon}`}
+                              sx={{
+                                width: { xs: 35, sm: 40 },
+                                height: { xs: 35, sm: 40 }
+                              }}
                             />
                           </ListItemAvatar>
                         </ListItemIcon>
@@ -151,9 +215,11 @@ const ExploreServers = () => {
                               sx={{
                                 textOverflow: "ellipsis",
                                 overflow: "hidden",
-                                whiteSpace: "nowrap",
+                                whiteSpace: { xs: "normal", sm: "nowrap" },
                                 fontWeight: 700,
-                                ml: 1, // Add margin left for mobile
+                                ml: { xs: 0.5, sm: 1 },
+                                fontSize: { xs: '0.875rem', sm: '0.875rem' },
+                                lineHeight: { xs: 1.2, sm: 1.43 }
                               }}
                             >
                               {item.name}
@@ -162,7 +228,11 @@ const ExploreServers = () => {
                           secondary={
                             <Typography 
                               variant="body2"
-                              sx={{ ml: 1 }} // Add margin left for mobile
+                              sx={{ 
+                                ml: { xs: 0.5, sm: 1 },
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                opacity: 0.8
+                              }}
                             >
                               {item.category}
                             </Typography>
@@ -173,11 +243,11 @@ const ExploreServers = () => {
                   </CardContent>
                 </Link>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
-    </>
+    </Box>
   );
 };
 

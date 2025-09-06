@@ -11,7 +11,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { MEDIA_URL } from "../../config";
-import { Server } from "../../@types/server.d";
+import type { Server } from "../../@types/server.d";
 import { useParams } from "react-router-dom";
 import ServerChannels from "../SecondaryDraw/ServerChannels";
 import { useEffect, useState } from "react";

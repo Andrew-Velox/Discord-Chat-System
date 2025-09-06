@@ -26,7 +26,7 @@ type Props = {
 };
 
 const PopularChannels: React.FC<Props> = ({ open }) => {
-  const { dataCRUD, error, isLoading, fetchData } = useCrud<Server>(
+  const { dataCRUD, fetchData } = useCrud<Server>(
     [],
     "/server/select/"
   );

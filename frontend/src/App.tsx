@@ -1,5 +1,5 @@
 import Home from "./pages/Home";
-import Server from "./pages/Server";
+import ServerPage from "./pages/Server";
 import Explore from "./pages/Explore";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import ToggleColorMode from "./components/ToggleColorMode";
@@ -24,7 +24,7 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <MembershipCheck>
-                      <Server />
+                      <ServerPage />
                     </MembershipCheck>
                   </ProtectedRoute>
                 }

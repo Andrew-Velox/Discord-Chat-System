@@ -24,7 +24,7 @@ interface Category {
 const ExploreCategories = () => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
-  const { dataCRUD, error, isLoading, fetchData } = useCrud<Category>(
+  const { dataCRUD, fetchData } = useCrud<Category>(
     [],
     "/server/category/"
   );

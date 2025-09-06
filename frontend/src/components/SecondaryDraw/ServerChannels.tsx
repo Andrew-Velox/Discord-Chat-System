@@ -5,11 +5,10 @@ import {
   ListItemText,
   Box,
   useTheme,
-  ListItemIcon,
   Typography,
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
-import { Server } from "../../@types/server.d";
+import type { Server } from "../../@types/server.d";
 
 interface ServerChannelsProps {
   data: Server[];
