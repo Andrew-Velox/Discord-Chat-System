@@ -47,7 +47,7 @@ const PopularChannels: React.FC<Props> = ({ open }) => {
         }}
       >
         <Typography sx={{ display: open ? "block" : "none" }}>
-          Popular
+          Popular Servers
         </Typography>
       </Box>
       <List>

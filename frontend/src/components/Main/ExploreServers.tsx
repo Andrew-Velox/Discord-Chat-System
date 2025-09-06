@@ -87,7 +87,7 @@ const ExploreServers = () => {
         >
           Recommended Channels
         </Typography>
-        <Grid container spacing={{ xs: 0, sm: 2 }}>
+        <Grid container spacing={{ xs: 2, sm: 2 }}>
           {dataCRUD.map((item) => (
             <Grid item key={item.id} xs={12} sm={6} md={6} lg={3}>
               <Card
@@ -98,6 +98,7 @@ const ExploreServers = () => {
                   boxShadow: "none",
                   backgroundImage: "none",
                   borderRadius: 0,
+                  mb: { xs: 2, sm: 0 }, // Add margin bottom for mobile
                 }}
               >
                 <Link
@@ -109,20 +110,31 @@ const ExploreServers = () => {
                     image={
                       item.banner
                         ? `${MEDIA_URL}${item.banner}`
-                        : "https://source.unsplash.com/random/"
+                        : "https://picsum.photos/300/200?random=1"
                     }
                     alt="random"
-                    sx={{ display: { xs: "none", sm: "block" } }}
+                    sx={{ 
+                      display: { xs: "none", sm: "block" },
+                      height: 200,
+                      width: "100%",
+                      objectFit: 'cover'
+                    }}
                   />
                   <CardContent
                     sx={{
                       flexGrow: 1,
-                      p: 0,
-                      "&:last-child": { paddingBottom: 0 },
+                      p: { xs: 2, sm: 0 }, // Add padding for mobile
+                      "&:last-child": { paddingBottom: { xs: 2, sm: 0 } },
                     }}
                   >
-                    <List>
-                      <ListItem disablePadding>
+                    <List sx={{ py: { xs: 1, sm: 0 } }}>
+                      <ListItem 
+                        disablePadding={false}
+                        sx={{ 
+                          py: { xs: 1, sm: 0 },
+                          px: { xs: 1, sm: 0 }
+                        }}
+                      >
                         <ListItemIcon sx={{ minWidth: 0 }}>
                           <ListItemAvatar sx={{ minWidth: "50px" }}>
                             <Avatar
@@ -141,13 +153,17 @@ const ExploreServers = () => {
                                 overflow: "hidden",
                                 whiteSpace: "nowrap",
                                 fontWeight: 700,
+                                ml: 1, // Add margin left for mobile
                               }}
                             >
                               {item.name}
                             </Typography>
                           }
                           secondary={
-                            <Typography variant="body2">
+                            <Typography 
+                              variant="body2"
+                              sx={{ ml: 1 }} // Add margin left for mobile
+                            >
                               {item.category}
                             </Typography>
                           }
