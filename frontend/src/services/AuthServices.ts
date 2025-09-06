@@ -14,7 +14,12 @@ export function useAuthService(): AuthServiceProps {
     // Check authentication status by verifying the cookie with the server
     const checkAuthStatus = async () => {
         setIsLoading(true);
+        
+        // First check localStorage for quick initial state
+        const localStorageAuth = localStorage.getItem("isLoggedIn") === "true";
+        
         try {
+            // Try to verify with the server if the endpoint exists
             const response = await axios.get(
                 `${BASE_URL}/auth/verify/`,
                 { withCredentials: true }
@@ -26,18 +31,23 @@ export function useAuthService(): AuthServiceProps {
             }
             return true;
         } catch (error: any) {
-            // If the endpoint doesn't exist (404) or is unauthorized (401)
-            // Fall back to localStorage check for now
-            if (error.response?.status === 404) {
-                console.log("Auth verification endpoint not available, falling back to localStorage");
-                const localStorageAuth = localStorage.getItem("isLoggedIn") === "true";
+            // If the endpoint doesn't exist (404) or server error, use localStorage
+            if (error.response?.status === 404 || error.response?.status >= 500) {
+                console.log("Auth verification endpoint not available, using localStorage");
                 setIsLoggedIn(localStorageAuth);
                 return localStorageAuth;
             }
             
-            setIsLoggedIn(false);
-            localStorage.setItem("isLoggedIn", "false");
-            return false;
+            // If unauthorized (401), user is not authenticated
+            if (error.response?.status === 401) {
+                setIsLoggedIn(false);
+                localStorage.setItem("isLoggedIn", "false");
+                return false;
+            }
+            
+            // For other errors, use localStorage as fallback
+            setIsLoggedIn(localStorageAuth);
+            return localStorageAuth;
         } finally {
             setIsLoading(false);
         }
