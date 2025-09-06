@@ -15,7 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import { useParams } from "react-router-dom";
 import usePublicCrud from "../../hooks/usePublicCrud";
 import { useEffect } from "react";
-import { MEDIA_URL } from "../../config";
+import { MEDIA_URL, BASE_URL } from "../../config";
 import { Link } from "react-router-dom";
 
 interface Server {
@@ -36,8 +36,10 @@ const ExploreServers = () => {
 
   useEffect(() => {
     console.log("ExploreServers: Fetching data from:", url);
+    console.log("ExploreServers: BASE_URL:", BASE_URL);
     fetchData().catch(error => {
       console.error("ExploreServers: Error fetching data:", error);
+      console.error("ExploreServers: Full URL:", `${BASE_URL}${url}`);
     });
   }, [categoryName]);
 
@@ -138,17 +140,27 @@ const ExploreServers = () => {
             }
           }}
         >
-          {dataCRUD.map((item) => (
-            <Box 
-              key={item.id}
-              sx={{
-                width: '100%',
-                minWidth: 0,
-                maxWidth: '100%',
-                overflow: 'hidden',
-                mb: { xs: 2, sm: 0 }
-              }}
-            >
+          {dataCRUD.length === 0 ? (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h6" color="textSecondary">
+                No servers found. Data length: {dataCRUD.length}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                URL: {url}
+              </Typography>
+            </Box>
+          ) : (
+            dataCRUD.map((item) => (
+              <Box 
+                key={item.id}
+                sx={{
+                  width: '100%',
+                  minWidth: 0,
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  mb: { xs: 2, sm: 0 }
+                }}
+              >
               <Card
                 sx={{
                   height: "100%",
@@ -251,7 +263,7 @@ const ExploreServers = () => {
                 </Link>
               </Card>
             </Box>
-          ))}
+          )))}
         </Box>
       </Container>
     </Box>
