@@ -17,7 +17,7 @@ const ServerPage = () => {
 
   const { dataCRUD, error, fetchData } = useCrud<Server>(
     [],
-    `/server/select/?by_serverid=${serverId}`
+    `/api/server/select/?by_serverid=${serverId}`
   );
 
   if (error !== null && error.message === "400") {
