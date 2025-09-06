@@ -22,6 +22,10 @@ DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
+# Security settings for production
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+SECURE_REFERRER_POLICY = "same-origin"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,9 +46,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -153,6 +157,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://discord-chat-system.vercel.app",
 ]
 
+# Fallback for production - allow all origins temporarily for debugging
+CORS_ALLOW_ALL_ORIGINS = True
+
 # Additional CORS settings for production
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -164,11 +171,23 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cache-control',
+    'pragma',
 ]
 
 CORS_EXPOSE_HEADERS = [
     'content-type',
     'x-csrftoken',
+]
+
+# Allow all methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 
