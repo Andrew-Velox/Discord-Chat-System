@@ -76,10 +76,15 @@ const useMembership = (): IuseServer => {
                 timestamp: now
             });
         } catch (error: any) {
-            // Only log error if it's not a 401 (which is expected for non-authenticated users)
-            if (error.response?.status !== 401) {
-                console.error("Error checking membership status:", error);
+            // For 401/403 errors (auth issues), don't log or throw - just handle gracefully
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                setIsUserMember(false);
+                setError(null); // Clear any previous errors
+                return; // Exit gracefully without throwing
             }
+            
+            // Only log and throw non-auth errors
+            console.error("Error checking membership status:", error);
             setError(error);
             throw error;
         } finally {

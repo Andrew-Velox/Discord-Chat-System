@@ -15,20 +15,30 @@ const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
   useEffect(() => {
     // Only check membership if:
     // 1. We have a serverId
-    // 2. User is logged in
-    // 3. Authentication is not still loading
-    if (!serverId || !isLoggedIn || isLoading) return;
+    // 2. User is definitively logged in (not just loading state)
+    // 3. Authentication is complete
+    if (!serverId || !isLoggedIn || isLoading) {
+      return;
+    }
 
+    // Double-check that we're actually authenticated
     const checkMembership = async () => {
       try {
         await isMember(Number(serverId));
-      } catch (error) {
-        console.error("Error checking membership status:", error);
+      } catch (error: any) {
+        // Completely suppress auth-related errors as they're expected
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          return; // Silently handle auth errors
+        }
+        // Only log actual unexpected errors
+        console.error("Unexpected error checking membership status:", error);
       }
     };
 
-    checkMembership();
-  }, [serverId, isMember, isLoggedIn, isLoading]); // Include isLoading to prevent premature calls
+    // Add a small delay to ensure auth state is fully settled
+    const timeoutId = setTimeout(checkMembership, 100);
+    return () => clearTimeout(timeoutId);
+  }, [serverId, isMember, isLoggedIn, isLoading]);
 
   return <>{children}</>;
 };
