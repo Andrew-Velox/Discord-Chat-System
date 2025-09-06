@@ -160,6 +160,13 @@ CORS_ALLOWED_ORIGINS = [
 # Fallback for production - allow all origins temporarily for debugging
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Explicit CORS configuration to ensure headers are set
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+    r"^https://discord-chat-system\.onrender\.com$",
+    r"^http://localhost:\d+$",
+]
+
 # Additional CORS settings for production
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -173,12 +180,17 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
     'cache-control',
     'pragma',
+    'access-control-allow-origin',
 ]
 
 CORS_EXPOSE_HEADERS = [
     'content-type',
     'x-csrftoken',
+    'access-control-allow-origin',
 ]
+
+# Ensure preflight requests are handled
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 # Allow all methods
 CORS_ALLOW_METHODS = [

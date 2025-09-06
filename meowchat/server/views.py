@@ -6,10 +6,24 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 from .models import Category, Server
 from .schema import server_list_docs
 from .serializer import CategorySerializer, ServerSerializer
+
+
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def cors_test(request):
+    """Test endpoint to verify CORS headers"""
+    response = JsonResponse({"message": "CORS test successful", "method": request.method})
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "*"
+    return response
 
 
 class ServerMemebershipViewSet(viewsets.ViewSet):

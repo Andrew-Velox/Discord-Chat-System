@@ -12,7 +12,7 @@ from django.contrib import admin
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
-from server.views import CategoryListViewSet, ServerListViewSet, ServerMemebershipViewSet
+from server.views import CategoryListViewSet, ServerListViewSet, ServerMemebershipViewSet, cors_test
 from webchat.consumer import WebChatConsumer
 from webchat.views import MessageViewSet
 
@@ -35,6 +35,7 @@ urlpatterns = [
     path("api/logout/", LogOutAPIView.as_view(), name="logout"),
     path("api/auth/verify/", VerifyAuthAPIView.as_view(), name="auth_verify"),
     path("api/register/", RegisterView.as_view(), name="register"),
+    path("api/cors-test/", cors_test, name="cors_test"),
 ] + router.urls
 
 websocket_urlpatterns = [path("<str:serverId>/<str:channelId>", WebChatConsumer.as_asgi())]
