@@ -7,7 +7,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import useCrud from "../../hooks/useCrud";
+import usePublicCrud from "../../hooks/usePublicCrud";
 import { useEffect } from "react";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
@@ -26,7 +26,7 @@ type Props = {
 };
 
 const PopularChannels: React.FC<Props> = ({ open }) => {
-  const { dataCRUD, fetchData } = useCrud<Server>(
+  const { dataCRUD, fetchData } = usePublicCrud<Server>(
     [],
     "/server/select/"
   );

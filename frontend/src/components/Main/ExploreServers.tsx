@@ -13,7 +13,7 @@ import Container from "@mui/material/Container";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { useParams } from "react-router-dom";
-import useCrud from "../../hooks/useCrud";
+import usePublicCrud from "../../hooks/usePublicCrud";
 import { useEffect } from "react";
 import { MEDIA_URL } from "../../config";
 import { Link } from "react-router-dom";
@@ -32,11 +32,18 @@ const ExploreServers = () => {
   const url = categoryName
     ? `/server/select/?category=${categoryName}`
     : "/server/select";
-  const { dataCRUD, fetchData } = useCrud<Server>([], url);
+  const { dataCRUD, fetchData } = usePublicCrud<Server>([], url);
 
   useEffect(() => {
-    fetchData();
+    console.log("ExploreServers: Fetching data from:", url);
+    fetchData().catch(error => {
+      console.error("ExploreServers: Error fetching data:", error);
+    });
   }, [categoryName]);
+
+  useEffect(() => {
+    console.log("ExploreServers: Data updated:", dataCRUD);
+  }, [dataCRUD]);
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh' }}>
