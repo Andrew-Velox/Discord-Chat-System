@@ -14,9 +14,10 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { useParams } from "react-router-dom";
 import usePublicCrud from "../../hooks/usePublicCrud";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MEDIA_URL, BASE_URL } from "../../config";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 interface Server {
   id: number;
@@ -37,6 +38,22 @@ const ExploreServers = () => {
   console.log("ExploreServers: Generated URL:", url);
   
   const { dataCRUD, fetchData } = usePublicCrud<Server>([], url);
+  const [directData, setDirectData] = useState<Server[]>([]);
+
+  // Direct API test
+  useEffect(() => {
+    console.log("Direct API test starting...");
+    axios.get(`${BASE_URL}${url}`)
+      .then(response => {
+        console.log("Direct API test success:", response.data);
+        setDirectData(response.data);
+      })
+      .catch(error => {
+        console.error("Direct API test failed:", error);
+      });
+  }, [url]);
+
+  const displayData = directData.length > 0 ? directData : dataCRUD;
 
   useEffect(() => {
     console.log("ExploreServers: Fetching data from:", url);
@@ -44,12 +61,14 @@ const ExploreServers = () => {
     fetchData().catch(error => {
       console.error("ExploreServers: Error fetching data:", error);
       console.error("ExploreServers: Full URL:", `${BASE_URL}${url}`);
+      // Don't re-throw the error, let the component continue with whatever data it has
     });
   }, [categoryName, fetchData]);
 
   useEffect(() => {
-    console.log("ExploreServers: Data updated:", dataCRUD);
-  }, [dataCRUD]);
+    console.log("ExploreServers: Hook data updated:", dataCRUD);
+    console.log("ExploreServers: Direct data updated:", directData);
+  }, [dataCRUD, directData]);
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh' }}>
@@ -144,17 +163,17 @@ const ExploreServers = () => {
             }
           }}
         >
-          {dataCRUD.length === 0 ? (
+          {displayData.length === 0 ? (
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <Typography variant="h6" color="textSecondary">
-                No servers found. Data length: {dataCRUD.length}
+                No servers found. Hook data length: {dataCRUD.length}, Direct data length: {directData.length}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                 URL: {url}
               </Typography>
             </Box>
           ) : (
-            dataCRUD.map((item) => (
+            displayData.map((item) => (
               <Box 
                 key={item.id}
                 sx={{

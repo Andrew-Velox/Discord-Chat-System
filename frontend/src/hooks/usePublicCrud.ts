@@ -27,12 +27,32 @@ const usePublicCrud = <T>(initialData: T[], apiURL: string): IusePublicCrud<T> =
                 timeout: 10000, // 10 second timeout
             });
             const data = response.data;
-            setDataCRUD(data);
             console.log('Public API response:', data); // Debug log
-            return data;
+            
+            // Ensure data is always set, even if there are other network issues
+            if (Array.isArray(data)) {
+                setDataCRUD(data);
+                return data;
+            } else {
+                console.warn('API response is not an array:', data);
+                setDataCRUD([]);
+                return [];
+            }
         } catch (error: any) {
             console.error('Public API error:', error); // Debug log
+            
+            // If we got a response but there's a network error, try to extract data
+            if (error.response && error.response.data) {
+                console.log('Extracting data from error response:', error.response.data);
+                const data = error.response.data;
+                if (Array.isArray(data)) {
+                    setDataCRUD(data);
+                    return data;
+                }
+            }
+            
             setError(error);
+            setDataCRUD([]); // Set empty array on error
             throw error;
         } finally {
             setIsLoading(false);
