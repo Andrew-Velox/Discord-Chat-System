@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "../config";
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface IusePublicCrud<T> {
     dataCRUD: T[];
@@ -14,9 +14,10 @@ const usePublicCrud = <T>(initialData: T[], apiURL: string): IusePublicCrud<T> =
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const fetchData = async (): Promise<T[]> => {
+    const fetchData = useCallback(async (): Promise<T[]> => {
         setIsLoading(true);
         setError(null);
+        console.log('Fetching from URL:', `${BASE_URL}${apiURL}`); // Debug log
         try {
             const response = await axios.get(`${BASE_URL}${apiURL}`, {
                 headers: {
@@ -36,7 +37,7 @@ const usePublicCrud = <T>(initialData: T[], apiURL: string): IusePublicCrud<T> =
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [apiURL]);
 
     return { fetchData, dataCRUD, error, isLoading };
 };

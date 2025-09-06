@@ -32,6 +32,10 @@ const ExploreServers = () => {
   const url = categoryName
     ? `/server/select/?category=${categoryName}`
     : "/server/select";
+  
+  console.log("ExploreServers: Component rendered with categoryName:", categoryName);
+  console.log("ExploreServers: Generated URL:", url);
+  
   const { dataCRUD, fetchData } = usePublicCrud<Server>([], url);
 
   useEffect(() => {
@@ -41,7 +45,7 @@ const ExploreServers = () => {
       console.error("ExploreServers: Error fetching data:", error);
       console.error("ExploreServers: Full URL:", `${BASE_URL}${url}`);
     });
-  }, [categoryName]);
+  }, [categoryName, fetchData]);
 
   useEffect(() => {
     console.log("ExploreServers: Data updated:", dataCRUD);
