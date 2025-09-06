@@ -10,10 +10,14 @@ interface MembershipCheckProps {
 const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
   const { serverId } = useParams();
   const { isMember } = useMembershipContext();
-  const { isLoggedIn } = useAuthServiceContext();
+  const { isLoggedIn, isLoading } = useAuthServiceContext();
 
   useEffect(() => {
-    if (!serverId || !isLoggedIn) return;
+    // Only check membership if:
+    // 1. We have a serverId
+    // 2. User is logged in
+    // 3. Authentication is not still loading
+    if (!serverId || !isLoggedIn || isLoading) return;
 
     const checkMembership = async () => {
       try {
@@ -24,7 +28,7 @@ const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
     };
 
     checkMembership();
-  }, [serverId, isMember, isLoggedIn]); // Now safe to include isMember since it's memoized
+  }, [serverId, isMember, isLoggedIn, isLoading]); // Include isLoading to prevent premature calls
 
   return <>{children}</>;
 };

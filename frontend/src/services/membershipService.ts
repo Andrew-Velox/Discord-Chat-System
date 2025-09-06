@@ -76,6 +76,10 @@ const useMembership = (): IuseServer => {
                 timestamp: now
             });
         } catch (error: any) {
+            // Only log error if it's not a 401 (which is expected for non-authenticated users)
+            if (error.response?.status !== 401) {
+                console.error("Error checking membership status:", error);
+            }
             setError(error);
             throw error;
         } finally {
