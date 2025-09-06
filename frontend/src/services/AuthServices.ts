@@ -18,36 +18,64 @@ export function useAuthService(): AuthServiceProps {
         // First check localStorage for quick initial state
         const localStorageAuth = localStorage.getItem("isLoggedIn") === "true";
         
+        // If we have no local storage indication of being logged in, don't bother checking server
+        if (!localStorageAuth) {
+            setIsLoggedIn(false);
+            setIsLoading(false);
+            return false;
+        }
+        
         try {
             // Try to verify with the server if the endpoint exists
             const response = await axios.get(
                 `${BASE_URL}/auth/verify/`,
-                { withCredentials: true }
+                { 
+                    withCredentials: true,
+                    timeout: 5000 // 5 second timeout
+                }
             );
+            
+            // Server confirms authentication
             setIsLoggedIn(true);
             localStorage.setItem("isLoggedIn", "true");
             if (response.data.user_id) {
                 localStorage.setItem("user_id", response.data.user_id);
             }
+            if (response.data.username) {
+                localStorage.setItem("username", response.data.username);
+            }
             return true;
         } catch (error: any) {
-            // If the endpoint doesn't exist (404) or server error, use localStorage
-            if (error.response?.status === 404 || error.response?.status >= 500) {
-                console.log("Auth verification endpoint not available, using localStorage");
+            console.log("Auth verification error:", error.response?.status);
+            
+            // If server is unreachable or has issues, trust localStorage temporarily
+            if (!error.response || error.response?.status >= 500) {
+                console.log("Server error, maintaining login state from localStorage");
                 setIsLoggedIn(localStorageAuth);
                 return localStorageAuth;
             }
             
-            // If unauthorized (401), user is not authenticated
-            if (error.response?.status === 401) {
+            // If unauthorized (401/403), clear authentication
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                console.log("Authentication expired, logging out");
                 setIsLoggedIn(false);
                 localStorage.setItem("isLoggedIn", "false");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("username");
                 return false;
             }
             
-            // For other errors, use localStorage as fallback
-            setIsLoggedIn(localStorageAuth);
-            return localStorageAuth;
+            // For other errors, trust localStorage but try to refresh token
+            console.log("Network or other error, attempting token refresh");
+            try {
+                await axios.post(`${BASE_URL}/token/refresh/`, {}, { withCredentials: true });
+                setIsLoggedIn(true);
+                return true;
+            } catch (refreshError) {
+                console.log("Token refresh failed, using localStorage state");
+                setIsLoggedIn(localStorageAuth);
+                return localStorageAuth;
+            }
         } finally {
             setIsLoading(false);
         }
@@ -66,14 +94,22 @@ export function useAuthService(): AuthServiceProps {
                 { withCredentials: true }
             );
             
+            // Store authentication state
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("user_id", response.data.user_id);
+            if (response.data.username) {
+                localStorage.setItem("username", response.data.username);
+            }
             setIsLoggedIn(true);
             
+            console.log("Login successful, user authenticated");
             return 200;
         } catch (err: any) {
+            console.log("Login failed:", err.response?.status);
             setIsLoggedIn(false);
             localStorage.setItem("isLoggedIn", "false");
+            localStorage.removeItem("user_id");
+            localStorage.removeItem("username");
             return err.response?.status || 500;
         }
     };
