@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useMembershipContext } from "../../context/MemberContext";
 import { useParams } from "react-router-dom";
+import { useAuthServiceContext } from "../../context/AuthContext";
 
 interface MembershipCheckProps {
   children: React.ReactNode;
@@ -9,9 +10,10 @@ interface MembershipCheckProps {
 const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
   const { serverId } = useParams();
   const { isMember } = useMembershipContext();
+  const { isLoggedIn } = useAuthServiceContext();
 
   useEffect(() => {
-    if (!serverId) return;
+    if (!serverId || !isLoggedIn) return;
 
     const checkMembership = async () => {
       try {
@@ -22,7 +24,7 @@ const MembershipCheck: React.FC<MembershipCheckProps> = ({ children }) => {
     };
 
     checkMembership();
-  }, [serverId, isMember]); // Now safe to include isMember since it's memoized
+  }, [serverId, isMember, isLoggedIn]); // Now safe to include isMember since it's memoized
 
   return <>{children}</>;
 };

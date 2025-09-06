@@ -66,7 +66,7 @@ const ExploreCategories = () => {
                   <ListItemAvatar sx={{ minWidth: "0px" }}>
                     <img
                       alt="server Icon"
-                      src={`${MEDIA_URL}${item.icon}`}
+                      src={item.icon ? `${MEDIA_URL}${item.icon}` : undefined}
                       style={{
                         width: "25px",
                         height: "25px",

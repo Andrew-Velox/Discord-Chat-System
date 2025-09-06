@@ -196,8 +196,10 @@ CHANNEL_LAYERS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Extended to 1 hour for better UX
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,  # Generate new refresh token on each refresh
+    "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens
     # JWTCookie settings
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",

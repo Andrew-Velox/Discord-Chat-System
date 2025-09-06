@@ -60,7 +60,7 @@ const UserServers: React.FC<Props & ServerChannelsProps> = ({ open, data }) => {
                   <ListItemAvatar sx={{ minWidth: "50px" }}>
                     <Avatar
                       alt="Server Icon"
-                      src={`${MEDIA_URL}${item.icon}`}
+                      src={item.icon ? `${MEDIA_URL}${item.icon}` : undefined}
                     />
                   </ListItemAvatar>
                 </ListItemIcon>

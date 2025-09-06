@@ -199,7 +199,7 @@ const ExploreServers = () => {
                           }}>
                             <Avatar
                               alt="server Icon"
-                              src={`${MEDIA_URL}${item.icon}`}
+                              src={item.icon ? `${MEDIA_URL}${item.icon}` : undefined}
                               sx={{
                                 width: { xs: 35, sm: 40 },
                                 height: { xs: 35, sm: 40 }

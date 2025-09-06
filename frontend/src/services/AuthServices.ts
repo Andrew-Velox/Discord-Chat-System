@@ -1,19 +1,43 @@
 
 import axios from "axios";
 import type { AuthServiceProps } from "../@types/auth-service";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 
 export function useAuthService(): AuthServiceProps {
     const navigate = useNavigate();
 
-    const getInitialLoggedInValue = () => {
-        const loggedIn = localStorage.getItem("isLoggedIn");
-        return loggedIn === "true";
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    // Check authentication status by verifying the cookie with the server
+    const checkAuthStatus = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/auth/verify/`,
+                { withCredentials: true }
+            );
+            setIsLoggedIn(true);
+            localStorage.setItem("isLoggedIn", "true");
+            if (response.data.user_id) {
+                localStorage.setItem("user_id", response.data.user_id);
+            }
+            return true;
+        } catch (error) {
+            setIsLoggedIn(false);
+            localStorage.setItem("isLoggedIn", "false");
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(getInitialLoggedInValue);
+    // Check auth status on component mount
+    useEffect(() => {
+        checkAuthStatus();
+    }, []);
 
     const login = async (username: string, password: string) => {
         try {
@@ -26,6 +50,10 @@ export function useAuthService(): AuthServiceProps {
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("user_id", response.data.user_id);
             setIsLoggedIn(true);
+            
+            // Re-check auth status to ensure consistency
+            await checkAuthStatus();
+            
             return 200;
         } catch (err: any) {
             setIsLoggedIn(false);
@@ -74,5 +102,5 @@ export function useAuthService(): AuthServiceProps {
         }
     };
 
-    return { login, isLoggedIn, logout, refreshAccessToken, register };
+    return { login, isLoggedIn, isLoading, logout, refreshAccessToken, register };
 }

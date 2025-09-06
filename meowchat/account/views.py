@@ -45,6 +45,17 @@ class LogOutAPIView(APIView):
         return response
 
 
+class VerifyAuthAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None):
+        return Response({
+            "authenticated": True,
+            "user_id": str(request.user.id),
+            "username": request.user.username
+        })
+
+
 class AccountViewSet(viewsets.ViewSet):
     queryset = Account.objects.all()
     permission_classes = [IsAuthenticated]

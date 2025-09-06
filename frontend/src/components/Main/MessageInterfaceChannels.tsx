@@ -86,7 +86,7 @@ const MessageInterfaceChannels = (props: ServerChannelProps) => {
             <ListItemAvatar sx={{ minWidth: "40px" }}>
               <Avatar
                 alt="Server Icon"
-                src={`${MEDIA_URL}${data?.[0]?.icon}`}
+                src={data?.[0]?.icon ? `${MEDIA_URL}${data[0].icon}` : undefined}
                 sx={{ width: 30, height: 30 }}
               />
             </ListItemAvatar>

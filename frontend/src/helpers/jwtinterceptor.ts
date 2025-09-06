@@ -7,16 +7,35 @@ const useAxiosWithJwtInterceptor = () => {
     withCredentials: true, // Always send cookies
   });
   const navigate = useNavigate();
-  const { logout } = useAuthService();
+  const { logout, refreshAccessToken } = useAuthService();
 
-  // Handle authentication errors
+  // Handle authentication errors with automatic token refresh
   jwtAxios.interceptors.response.use(
     (response) => response,
-    (error) => {
-      if (error.response?.status === 401 || error.response?.status === 403) {
+    async (error) => {
+      const originalRequest = error.config;
+
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        
+        try {
+          // Try to refresh the access token
+          await refreshAccessToken();
+          // Retry the original request
+          return jwtAxios(originalRequest);
+        } catch (refreshError) {
+          // Refresh failed, logout user
+          logout();
+          navigate("/login");
+          return Promise.reject(refreshError);
+        }
+      }
+
+      if (error.response?.status === 403) {
         logout();
         navigate("/login");
       }
+      
       return Promise.reject(error);
     }
   );

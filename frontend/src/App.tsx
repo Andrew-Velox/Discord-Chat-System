@@ -10,11 +10,13 @@ import ProtectedRoute from "./services/ProtectedRoute";
 import Register from "./pages/Register";
 import { MembershipProvider } from "./context/MemberContext";
 import MembershipCheck from "./components/Membership/MembershipCheck";
+import TokenRefresh from "./components/Auth/TokenRefresh";
 
 const App = () => {
   return (
     <BrowserRouter>
       <AuthServiceProvider>
+        <TokenRefresh />
         <MembershipProvider>
           <ToggleColorMode>
             <Routes>

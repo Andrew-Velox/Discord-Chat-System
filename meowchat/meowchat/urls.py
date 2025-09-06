@@ -4,6 +4,7 @@ from account.views import (
     JWTCookieTokenRefreshView,
     LogOutAPIView,
     RegisterView,
+    VerifyAuthAPIView,
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -32,6 +33,7 @@ urlpatterns = [
     path("api/token/", JWTCookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", JWTCookieTokenRefreshView.as_view(), name="token_refresh"),
     path("api/logout/", LogOutAPIView.as_view(), name="logout"),
+    path("api/auth/verify/", VerifyAuthAPIView.as_view(), name="auth_verify"),
     path("api/register/", RegisterView.as_view(), name="register"),
 ] + router.urls
 
