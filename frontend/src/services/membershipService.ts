@@ -25,7 +25,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.post(`${BASE_URL}/membership/${serverId}/membership/`);
+            await jwtAxios.post(`${BASE_URL}/api/membership/${serverId}/membership/`);
             setIsUserMember(true);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
@@ -41,7 +41,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.delete(`${BASE_URL}/membership/${serverId}/membership/remove_member/`);
+            await jwtAxios.delete(`${BASE_URL}/api/membership/${serverId}/membership/remove_member/`);
             setIsUserMember(false);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
@@ -66,7 +66,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await jwtAxios.get(`${BASE_URL}/membership/${serverId}/membership/is_member/`);
+            const response = await jwtAxios.get(`${BASE_URL}/api/membership/${serverId}/membership/is_member/`);
             const isMemberResult = response.data.is_member;
             setIsUserMember(isMemberResult);
             
@@ -83,10 +83,18 @@ const useMembership = (): IuseServer => {
                 return; // Exit gracefully without throwing
             }
             
-            // Only log and throw non-auth errors
+            // For 404 errors (endpoint not found), also handle gracefully
+            if (error.response?.status === 404) {
+                console.warn("Membership endpoint not found - user is not a member");
+                setIsUserMember(false);
+                setError(null);
+                return; // Exit gracefully without throwing
+            }
+            
+            // Only log and handle other errors, but don't throw to prevent infinite loops
             console.error("Error checking membership status:", error);
             setError(error);
-            throw error;
+            setIsUserMember(false); // Default to not a member on error
         } finally {
             setIsLoading(false);
         }
