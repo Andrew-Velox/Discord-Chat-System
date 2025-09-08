@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "corsheaders",
+    "channels",
     # Internal
     "account",
     "server",
@@ -75,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "meowchat.wsgi.application"
+ASGI_APPLICATION = "meowchat.asgi.application"
 
 
 # Database
