@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuthService } from "../services/AuthServices";
 import useCrud from "../hooks/useCrud";
 import { WS_ROOT } from "../config";
+import { useMembershipContext } from "../context/MemberContext";
 
 interface Message {
     id: number;
@@ -16,6 +17,7 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
     const [newMessage, setNewMessage] = useState<Message[]>([]);
     const [message, setMessage] = useState("");
     const { logout, refreshAccessToken } = useAuthService();
+    const { isMember } = useMembershipContext();
     const { fetchData } = useCrud<Message>(
       [],
       `/api/messages/?channel_id=${channelId}`
@@ -34,6 +36,16 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
           const data = await fetchData();
           setNewMessage(Array.isArray(data) ? data : []);
           console.log("Connected!!!");
+          
+          // Check membership status when successfully connected to channel
+          if (serverId) {
+            try {
+              await isMember(Number(serverId));
+              console.log("Membership status checked");
+            } catch (error) {
+              console.log("Membership check failed, but connection successful");
+            }
+          }
         } catch (error) {
           console.log(error);
         }
