@@ -27,11 +27,41 @@ export function useAuthService(): AuthServiceProps {
             return false;
         }
         
-        // Trust localStorage completely to avoid server verification issues
-        console.log("Authentication state from localStorage:", localStorageAuth);
-        setIsLoggedIn(localStorageAuth);
-        setIsLoading(false);
-        return localStorageAuth;
+        // For WebSocket connections, we need to ensure the JWT cookie is still valid
+        // Let's do a lightweight check to make sure the backend can authenticate us
+        try {
+            await axios.get(`${BASE_URL}/api/auth/verify/`, { withCredentials: true });
+            console.log("JWT cookie verification successful");
+            setIsLoggedIn(true);
+            setIsLoading(false);
+            return true;
+        } catch (error: any) {
+            // If cookie verification fails, try to refresh
+            if (error.response?.status === 401) {
+                console.log("JWT cookie expired, attempting refresh...");
+                try {
+                    await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { withCredentials: true });
+                    console.log("Token refresh successful");
+                    setIsLoggedIn(true);
+                    setIsLoading(false);
+                    return true;
+                } catch (refreshError) {
+                    console.log("Token refresh failed, user needs to login again");
+                    localStorage.setItem("isLoggedIn", "false");
+                    localStorage.removeItem("user_id");
+                    localStorage.removeItem("username");
+                    setIsLoggedIn(false);
+                    setIsLoading(false);
+                    return false;
+                }
+            }
+            
+            // For other errors, trust localStorage but log the issue
+            console.log("Auth verification had issues, but trusting localStorage:", error.response?.status);
+            setIsLoggedIn(localStorageAuth);
+            setIsLoading(false);
+            return localStorageAuth;
+        }
     };
 
     // Check auth status on component mount
