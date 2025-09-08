@@ -1,2 +1,25 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Tell GitHub this is primarily a TypeScript project
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+
+# Exclude static files and vendor code from language stats
+staticfiles/* linguist-vendored
+meowchat/staticfiles/* linguist-vendored
+*/node_modules/* linguist-vendored
+*/dist/* linguist-vendored
+*/build/* linguist-vendored
+
+# Mark frontend as the main project area
+frontend/* linguist-language=TypeScript
+frontend/src/* linguist-language=TypeScript
+
+# Exclude minified files
+*.min.js linguist-vendored
+*.min.css linguist-vendored
+
+# Backend is Python
+*.py linguist-language=Python
+meowchat/* linguist-language=Python
