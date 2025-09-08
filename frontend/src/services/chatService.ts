@@ -18,7 +18,7 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
     const { logout, refreshAccessToken } = useAuthService();
     const { fetchData } = useCrud<Message>(
       [],
-      `/messages/?channel_id=${channelId}`
+      `/api/messages/?channel_id=${channelId}`
     );
 
     const socketUrl = channelId
@@ -47,11 +47,12 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
             }
           });
         }
-        console.log("Close");
+        console.log("WebSocket closed with code:", event.code);
         setReconnectionAttempt((prevAttempt) => prevAttempt + 1);
       },
       onError: () => {
-        console.log("Error!");
+        console.log("WebSocket Error - stopping reconnection attempts");
+        setReconnectionAttempt(maxConnectionAttempts); // Stop reconnecting on error
       },
       onMessage: (msg) => {
         const data = JSON.parse(msg.data);
@@ -59,14 +60,25 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
         setMessage("");
       },
       shouldReconnect: (closeEvent) => {
-        if (
-          closeEvent.code === 4001 &&
-          reconnectionAttempt >= maxConnectionAttempts
-        ) {
-          setReconnectionAttempt(0);
+        // Don't reconnect if we've exceeded max attempts
+        if (reconnectionAttempt >= maxConnectionAttempts) {
+          console.log("Max reconnection attempts reached, stopping");
           return false;
         }
-        return true;
+        
+        // Don't reconnect on authentication errors
+        if (closeEvent.code === 4001) {
+          console.log("Authentication error, not reconnecting");
+          return false;
+        }
+        
+        // Don't reconnect on general errors (1006 is common for connection failures)
+        if (closeEvent.code === 1006) {
+          console.log("Connection failed, not reconnecting");
+          return false;
+        }
+        
+        return false; // Disable auto-reconnect for now to prevent infinite errors
       },
       reconnectInterval: 1000,
     });
