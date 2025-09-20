@@ -154,19 +154,23 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Production-specific CORS origins
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:5174", 
     "http://localhost:8000",
     "https://discord-chat-system.vercel.app",
+    "https://discord-chat-system.onrender.com",
 ]
 
-# Fallback for production - allow all origins temporarily for debugging
-CORS_ALLOW_ALL_ORIGINS = True
+# Fallback for production - more restrictive than before
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in debug mode
 
 # Explicit CORS configuration to ensure headers are set
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
-    r"^https://discord-chat-system\.onrender\.com$",
+    r"^https://discord-chat-system.*\.onrender\.com$",
     r"^http://localhost:\d+$",
 ]
 
@@ -211,14 +215,15 @@ CHANNEL_LAYERS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Extended to 1 hour for better UX
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # Shorter lifetime for security
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Reasonable refresh token lifetime
     "ROTATE_REFRESH_TOKENS": True,  # Generate new refresh token on each refresh
     "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens
     # JWTCookie settings
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
-    "JWT_COOKIE_SAMESITE": "Lax",
+    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # Required for cross-origin cookies
     "JWT_COOKIE_SECURE": not DEBUG,  # True for production HTTPS, False for development
     "JWT_COOKIE_HTTPONLY": True,
+    "JWT_COOKIE_DOMAIN": ".onrender.com" if not DEBUG else None,  # Domain for production
 }

@@ -4,6 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Account
 from .schemas import user_list_docs
@@ -39,8 +42,29 @@ class LogOutAPIView(APIView):
     def post(self, request, format=None):
         response = Response("Logged out successfully")
 
-        response.set_cookie("refresh_token", "", expires=0)
-        response.set_cookie("access_token", "", expires=0)
+        # Clear cookies with proper domain and path settings
+        cookie_kwargs = {
+            "expires": 0,
+            "path": "/",
+            "httponly": True,
+            "samesite": settings.SIMPLE_JWT.get("JWT_COOKIE_SAMESITE", "Lax"),
+            "secure": settings.SIMPLE_JWT.get("JWT_COOKIE_SECURE", False),
+        }
+        
+        # Add domain for production
+        if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
+            cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
+
+        response.set_cookie(
+            settings.SIMPLE_JWT.get("REFRESH_TOKEN_NAME", "refresh_token"), 
+            "", 
+            **cookie_kwargs
+        )
+        response.set_cookie(
+            settings.SIMPLE_JWT.get("ACCESS_TOKEN_NAME", "access_token"), 
+            "", 
+            **cookie_kwargs
+        )
 
         return response
 
@@ -71,22 +95,41 @@ class AccountViewSet(viewsets.ViewSet):
 class JWTSetCookieMixin:
     def finalize_response(self, request, response, *args, **kwargs):
         if response.data.get("refresh"):
+            cookie_kwargs = {
+                "max_age": settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                "httponly": settings.SIMPLE_JWT["JWT_COOKIE_HTTPONLY"],
+                "samesite": settings.SIMPLE_JWT["JWT_COOKIE_SAMESITE"],
+                "secure": settings.SIMPLE_JWT["JWT_COOKIE_SECURE"],
+                "path": "/",  # Ensure cookie is available for all paths
+            }
+            
+            # Add domain for production
+            if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]:
+                cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
+                
             response.set_cookie(
                 settings.SIMPLE_JWT["REFRESH_TOKEN_NAME"],
                 response.data["refresh"],
-                max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
-                httponly=settings.SIMPLE_JWT["JWT_COOKIE_HTTPONLY"],
-                samesite=settings.SIMPLE_JWT["JWT_COOKIE_SAMESITE"],
-                secure=settings.SIMPLE_JWT["JWT_COOKIE_SECURE"],
+                **cookie_kwargs
             )
+            
         if response.data.get("access"):
+            cookie_kwargs = {
+                "max_age": settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                "httponly": settings.SIMPLE_JWT["JWT_COOKIE_HTTPONLY"],
+                "samesite": settings.SIMPLE_JWT["JWT_COOKIE_SAMESITE"],
+                "secure": settings.SIMPLE_JWT["JWT_COOKIE_SECURE"],
+                "path": "/",  # Ensure cookie is available for all paths
+            }
+            
+            # Add domain for production
+            if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]:
+                cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
+                
             response.set_cookie(
                 settings.SIMPLE_JWT["ACCESS_TOKEN_NAME"],
                 response.data["access"],
-                max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-                httponly=settings.SIMPLE_JWT["JWT_COOKIE_HTTPONLY"],
-                samesite=settings.SIMPLE_JWT["JWT_COOKIE_SAMESITE"],
-                secure=settings.SIMPLE_JWT["JWT_COOKIE_SECURE"],
+                **cookie_kwargs
             )
             del response.data["access"]
 
@@ -99,3 +142,16 @@ class JWTCookieTokenObtainPairView(JWTSetCookieMixin, TokenObtainPairView):
 
 class JWTCookieTokenRefreshView(JWTSetCookieMixin, TokenRefreshView):
     serializer_class = JWTCookieTokenRefreshSerializer
+
+    def post(self, request, *args, **kwargs):
+        logger.info(f"Token refresh request - Cookies: {request.COOKIES}")
+        logger.info(f"Token refresh request - Headers: {dict(request.headers)}")
+        logger.info(f"Token refresh request - Data: {request.data}")
+        
+        try:
+            response = super().post(request, *args, **kwargs)
+            logger.info(f"Token refresh response status: {response.status_code}")
+            return response
+        except Exception as e:
+            logger.error(f"Token refresh error: {str(e)}")
+            raise
