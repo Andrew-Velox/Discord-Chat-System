@@ -25,11 +25,19 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.post(`${BASE_URL}/api/membership/${serverId}/membership/`);
+            await jwtAxios.post(`${BASE_URL}/api/membership/${serverId}/`);
             setIsUserMember(true);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
         } catch (error: any) {
+            // Handle 409 conflict (user already a member) gracefully
+            if (error.response?.status === 409) {
+                console.log("User is already a member of this server");
+                setIsUserMember(true);
+                membershipCache.current.delete(serverId);
+                // Don't throw error for 409 - it's expected behavior
+                return;
+            }
             setError(error);
             throw error;
         } finally {
@@ -41,7 +49,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.delete(`${BASE_URL}/api/membership/${serverId}/membership/remove_member/`);
+            await jwtAxios.delete(`${BASE_URL}/api/membership/${serverId}/remove_member/`);
             setIsUserMember(false);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
@@ -66,7 +74,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await jwtAxios.get(`${BASE_URL}/api/membership/${serverId}/membership/is_member/`);
+            const response = await jwtAxios.get(`${BASE_URL}/api/membership/${serverId}/is_member/`);
             const isMemberResult = response.data.is_member;
             setIsUserMember(isMemberResult);
             

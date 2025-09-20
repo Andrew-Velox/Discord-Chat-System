@@ -18,9 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG")
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["*"]
+# Get allowed hosts from environment variable or use default
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",") if os.environ.get("ALLOWED_HOSTS") else ["*"]
 
 # Security settings for production
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
@@ -218,6 +219,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
     "JWT_COOKIE_SAMESITE": "Lax",
-    "JWT_COOKIE_SECURE": True,  # True for production HTTPS
+    "JWT_COOKIE_SECURE": not DEBUG,  # True for production HTTPS, False for development
     "JWT_COOKIE_HTTPONLY": True,
 }

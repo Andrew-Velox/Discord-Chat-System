@@ -22,7 +22,7 @@ router.register("api/server/category", CategoryListViewSet)
 router.register("api/messages", MessageViewSet, basename="message")
 router.register("api/account", AccountViewSet, basename="account")
 router.register(
-    r"api/membership/(?P<server_id>\d+)/membership", ServerMemebershipViewSet, basename="server-membership"
+    r"api/membership/(?P<server_id>\d+)", ServerMemebershipViewSet, basename="server-membership"
 )
 
 
@@ -38,7 +38,7 @@ urlpatterns = [
     path("api/cors-test/", cors_test, name="cors_test"),
 ] + router.urls
 
-websocket_urlpatterns = [path("<str:serverId>/<str:channelId>", WebChatConsumer.as_asgi())]
+websocket_urlpatterns = [path("ws/<str:serverId>/<str:channelId>", WebChatConsumer.as_asgi())]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

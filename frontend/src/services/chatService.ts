@@ -24,7 +24,7 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
     );
 
     const socketUrl = channelId
-    ? `${WS_ROOT}/${serverId}/${channelId}`
+    ? `${WS_ROOT}/ws/${serverId}/${channelId}`
     : null;
     
     const [reconnectionAttempt, setReconnectionAttempt] = useState(0);
