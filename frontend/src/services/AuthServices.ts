@@ -27,47 +27,43 @@ export function useAuthService(): AuthServiceProps {
             return false;
         }
         
-        // For WebSocket connections, we need to ensure the JWT cookie is still valid
-        // Let's do a lightweight check to make sure the backend can authenticate us
+        // Trust localStorage primarily and only verify in background
+        // This prevents the "flickering" logout behavior on page refresh
+        setIsLoggedIn(true);
+        setIsLoading(false);
+        
+        // Do background verification but don't immediately logout on failure
         try {
             await axios.get(`${BASE_URL}/api/auth/verify/`, { withCredentials: true });
             console.log("JWT cookie verification successful");
-            setIsLoggedIn(true);
-            setIsLoading(false);
             return true;
         } catch (error: any) {
-            // If cookie verification fails, try to refresh
+            console.log("JWT cookie verification failed:", error.response?.status);
+            
+            // Try to refresh token in background
             if (error.response?.status === 401) {
-                console.log("JWT cookie expired, attempting refresh...");
                 try {
                     await axios.post(`${BASE_URL}/api/token/refresh/`, {}, { withCredentials: true });
                     console.log("Token refresh successful");
-                    setIsLoggedIn(true);
-                    setIsLoading(false);
                     return true;
                 } catch (refreshError: any) {
-                    console.log("Token refresh failed, user needs to login again");
-                    // Only clear localStorage if refresh explicitly fails with 401
+                    console.log("Token refresh failed:", refreshError.response?.status);
+                    // Only force logout if refresh explicitly returns 401 (invalid refresh token)
                     if (refreshError.response?.status === 401) {
+                        console.log("Both access and refresh tokens invalid - forcing logout");
                         localStorage.setItem("isLoggedIn", "false");
                         localStorage.removeItem("user_id");
                         localStorage.removeItem("username");
                         setIsLoggedIn(false);
-                    } else {
-                        // For network errors or other issues, trust localStorage but set offline state
-                        console.log("Network/server error during refresh, trusting localStorage");
-                        setIsLoggedIn(localStorageAuth);
+                        return false;
                     }
-                    setIsLoading(false);
-                    return false;
+                    // For other errors, stay logged in but log the issue
+                    console.log("Non-401 refresh error, staying logged in");
+                    return true;
                 }
             }
-            
-            // For other errors, trust localStorage but log the issue
-            console.log("Auth verification had non-401 error, trusting localStorage:", error.response?.status);
-            setIsLoggedIn(localStorageAuth);
-            setIsLoading(false);
-            return localStorageAuth;
+            // For non-401 errors, stay logged in
+            return true;
         }
     };
 

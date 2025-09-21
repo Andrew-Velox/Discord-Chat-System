@@ -218,7 +218,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Shorter lifetime for security
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),  # Reasonable refresh token lifetime
     "ROTATE_REFRESH_TOKENS": True,  # Generate new refresh token on each refresh
-    "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens
+    "BLACKLIST_AFTER_ROTATION": False,  # Temporarily disable to debug refresh issues
     # JWTCookie settings
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
