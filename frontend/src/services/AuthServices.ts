@@ -69,7 +69,12 @@ export function useAuthService(): AuthServiceProps {
 
     // Check auth status on component mount
     useEffect(() => {
-        checkAuthStatus();
+        // Add a small delay to prevent multiple simultaneous auth checks
+        const timer = setTimeout(() => {
+            checkAuthStatus();
+        }, 100);
+        
+        return () => clearTimeout(timer);
     }, []);
 
     const login = async (username: string, password: string) => {

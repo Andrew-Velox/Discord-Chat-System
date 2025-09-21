@@ -11,6 +11,8 @@ import Register from "./pages/Register";
 import { MembershipProvider } from "./context/MemberContext";
 import MembershipCheck from "./components/Membership/MembershipCheck";
 import TokenRefresh from "./components/Auth/TokenRefresh";
+// Import axios configuration to ensure all requests include credentials
+import "./utils/axios";
 
 const App = () => {
   return (
