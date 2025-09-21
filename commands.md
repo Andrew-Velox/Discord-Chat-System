@@ -1,1 +1,4 @@
 uvicorn meowchat.asgi:application --port 8000 --workers 4 --log-level debug --reload
+
+
+python -m uvicorn meowchat.asgi:application --port 8000 --reload
