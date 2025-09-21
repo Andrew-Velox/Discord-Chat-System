@@ -153,21 +153,22 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": True,
 }
 
-# CSRF cookies must match JWT cookies
-CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
-
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Production-specific CORS origins
+# ✅ Only allow your frontend origin (Vercel). Do NOT add your backend domain here.
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174", 
-    "http://localhost:8000",
     "https://discord-chat-system.vercel.app",
-    # "https://discord-chat-system.onrender.com",
 ]
+
+# For localhost dev
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:8000",
+    ]
+
 
 # Fallback for production - more restrictive than before
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in debug mode
@@ -220,16 +221,25 @@ CHANNEL_LAYERS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Shorter lifetime for security
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),  # Reasonable refresh token lifetime
-    "ROTATE_REFRESH_TOKENS": True,  # Generate new refresh token on each refresh
-    "BLACKLIST_AFTER_ROTATION": False,  # Temporarily disable to debug refresh issues
-    # JWTCookie settings
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+
+    # Cookie names
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
-    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # Required for cross-origin cookies
-    "JWT_COOKIE_SECURE": not DEBUG,  # True for production HTTPS, False for development
+
+    # Cookie security
+    "JWT_COOKIE_SECURE": not DEBUG,                # True on HTTPS
+    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",
     "JWT_COOKIE_HTTPONLY": True,
-    # Don't set domain - let browser handle it automatically
+
+    # Let browser decide domain (no hardcoding)
     "JWT_COOKIE_DOMAIN": None,
 }
+
+# CSRF cookies (must match JWT settings)
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+CSRF_COOKIE_HTTPONLY = False   # CSRF cookie must be readable by JS
