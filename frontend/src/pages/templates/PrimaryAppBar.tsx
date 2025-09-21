@@ -3,7 +3,6 @@ import {
   Box,
   Drawer,
   IconButton,
-  Link,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -13,6 +12,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useEffect, useState } from "react";
 import ExploreCategories from "../../components/SecondaryDraw/ExploreCategories";
 import AccountButton from "../../components/PrimaryAppBar/AccountButton";
+import { Link } from "react-router-dom"; // Use React Router Link
 
 const PrimaryAppBar = () => {
   const [sideMenu, setSideMenu] = useState(false);
@@ -79,7 +79,7 @@ const PrimaryAppBar = () => {
           {list()}
         </Drawer>
 
-        <Link href="/" underline="none" color="inherit">
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Typography
             variant="h6"
             noWrap
