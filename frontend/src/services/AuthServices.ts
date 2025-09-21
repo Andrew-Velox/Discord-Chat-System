@@ -45,19 +45,26 @@ export function useAuthService(): AuthServiceProps {
                     setIsLoggedIn(true);
                     setIsLoading(false);
                     return true;
-                } catch (refreshError) {
+                } catch (refreshError: any) {
                     console.log("Token refresh failed, user needs to login again");
-                    localStorage.setItem("isLoggedIn", "false");
-                    localStorage.removeItem("user_id");
-                    localStorage.removeItem("username");
-                    setIsLoggedIn(false);
+                    // Only clear localStorage if refresh explicitly fails with 401
+                    if (refreshError.response?.status === 401) {
+                        localStorage.setItem("isLoggedIn", "false");
+                        localStorage.removeItem("user_id");
+                        localStorage.removeItem("username");
+                        setIsLoggedIn(false);
+                    } else {
+                        // For network errors or other issues, trust localStorage but set offline state
+                        console.log("Network/server error during refresh, trusting localStorage");
+                        setIsLoggedIn(localStorageAuth);
+                    }
                     setIsLoading(false);
                     return false;
                 }
             }
             
             // For other errors, trust localStorage but log the issue
-            console.log("Auth verification had issues, but trusting localStorage:", error.response?.status);
+            console.log("Auth verification had non-401 error, trusting localStorage:", error.response?.status);
             setIsLoggedIn(localStorageAuth);
             setIsLoading(false);
             return localStorageAuth;
