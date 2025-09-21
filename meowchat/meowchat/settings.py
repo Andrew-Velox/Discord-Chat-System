@@ -153,6 +153,11 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": True,
 }
 
+# CSRF cookies must match JWT cookies
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+
+
 CORS_ALLOW_CREDENTIALS = True
 
 # Production-specific CORS origins
@@ -161,7 +166,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174", 
     "http://localhost:8000",
     "https://discord-chat-system.vercel.app",
-    "https://discord-chat-system.onrender.com",
+    # "https://discord-chat-system.onrender.com",
 ]
 
 # Fallback for production - more restrictive than before
@@ -226,5 +231,5 @@ SIMPLE_JWT = {
     "JWT_COOKIE_SECURE": not DEBUG,  # True for production HTTPS, False for development
     "JWT_COOKIE_HTTPONLY": True,
     # Don't set domain - let browser handle it automatically
-    # "JWT_COOKIE_DOMAIN": ".onrender.com" if not DEBUG else None,
+    "JWT_COOKIE_DOMAIN": None,
 }
