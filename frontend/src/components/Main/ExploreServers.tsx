@@ -17,7 +17,7 @@ import usePublicCrud from "../../hooks/usePublicCrud";
 import { useEffect, useState } from "react";
 import { MEDIA_URL, BASE_URL } from "../../config";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../../utils/axios"; // Use configured axios
 
 interface Server {
   id: number;

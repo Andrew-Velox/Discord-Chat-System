@@ -1,5 +1,5 @@
 
-import axios from "axios";
+import axios from "../utils/axios"; // Use configured axios
 import type { AuthServiceProps } from "../@types/auth-service";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "../config";

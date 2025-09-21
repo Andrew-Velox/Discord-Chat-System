@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/axios"; // Use configured axios
 import { BASE_URL } from "../config";
 import { useState, useCallback } from 'react';
 
