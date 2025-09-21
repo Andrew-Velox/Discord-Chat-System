@@ -215,8 +215,8 @@ CHANNEL_LAYERS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # Shorter lifetime for security
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Reasonable refresh token lifetime
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Shorter lifetime for security
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),  # Reasonable refresh token lifetime
     "ROTATE_REFRESH_TOKENS": True,  # Generate new refresh token on each refresh
     "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens
     # JWTCookie settings
@@ -225,5 +225,6 @@ SIMPLE_JWT = {
     "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # Required for cross-origin cookies
     "JWT_COOKIE_SECURE": not DEBUG,  # True for production HTTPS, False for development
     "JWT_COOKIE_HTTPONLY": True,
-    "JWT_COOKIE_DOMAIN": ".onrender.com" if not DEBUG else None,  # Domain for production
+    # Don't set domain - let browser handle it automatically
+    # "JWT_COOKIE_DOMAIN": ".onrender.com" if not DEBUG else None,
 }

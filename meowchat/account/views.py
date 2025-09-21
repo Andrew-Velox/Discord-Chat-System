@@ -51,8 +51,8 @@ class LogOutAPIView(APIView):
             "secure": settings.SIMPLE_JWT.get("JWT_COOKIE_SECURE", False),
         }
         
-        # Add domain for production
-        if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
+        # Only add domain if explicitly set (removed for cross-origin dev)
+        if settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
             cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
 
         response.set_cookie(
@@ -103,8 +103,8 @@ class JWTSetCookieMixin:
                 "path": "/",  # Ensure cookie is available for all paths
             }
             
-            # Add domain for production
-            if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]:
+            # Only add domain if explicitly set (removed for cross-origin dev)
+            if settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
                 cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
                 
             response.set_cookie(
@@ -122,8 +122,8 @@ class JWTSetCookieMixin:
                 "path": "/",  # Ensure cookie is available for all paths
             }
             
-            # Add domain for production
-            if hasattr(settings.SIMPLE_JWT, "JWT_COOKIE_DOMAIN") and settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]:
+            # Only add domain if explicitly set (removed for cross-origin dev)
+            if settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
                 cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
                 
             response.set_cookie(
