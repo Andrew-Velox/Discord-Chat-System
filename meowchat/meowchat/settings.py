@@ -147,7 +147,7 @@ AUTH_USER_MODEL = "account.Account"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # Enable Django session auth
+        "account.authentication.CSRFExemptSessionAuthentication",  # Custom CSRF-exempt session auth
         "account.authenticate.JWTCookieAuthentication",  # Keep JWT as fallback
     ],
 }
