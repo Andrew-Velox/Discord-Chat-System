@@ -1,7 +1,5 @@
 from account.views import (
     AccountViewSet,
-    JWTCookieTokenObtainPairView,
-    JWTCookieTokenRefreshView,
     LogOutAPIView,
     RegisterView,
     VerifyAuthAPIView,
@@ -34,14 +32,13 @@ urlpatterns = [
     path("api/docs/schema/ui/", SpectacularSwaggerView.as_view()),
     
     # Simple Django session-based authentication (NEW - reliable for deployment)
+    # Simple Session Authentication (Primary)
     path("api/auth/login/", simple_login, name="simple_login"),
     path("api/auth/logout/", simple_logout, name="simple_logout"), 
     path("api/auth/verify/", simple_verify, name="simple_verify"),
     path("api/auth/register/", simple_register, name="simple_register"),
     
-    # Legacy JWT routes (keep for backwards compatibility)
-    path("api/token/", JWTCookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", JWTCookieTokenRefreshView.as_view(), name="token_refresh"),
+    # Legacy endpoints (use session authentication now)
     path("api/logout/", LogOutAPIView.as_view(), name="logout"),
     path("api/register/", RegisterView.as_view(), name="register"),
     
