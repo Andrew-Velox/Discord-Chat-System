@@ -1,8 +1,8 @@
 import useWebSocket from "react-use-websocket";
 import { useState } from "react";
-import { useAuthService } from "../services/AuthServices";
-import useCrud from "../hooks/useCrud";
 import { WS_ROOT } from "../config";
+import { useAuthService } from "../services/SimpleAuthService"; // Use simple Django auth
+import useCrud from "../hooks/useCrud";
 import { useMembershipContext } from "../context/MemberContext";
 
 interface Message {
