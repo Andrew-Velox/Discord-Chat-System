@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -68,6 +68,7 @@ class ServerMemebershipViewSet(viewsets.ViewSet):
 
 class CategoryListViewSet(viewsets.ViewSet):
     queryset = Category.objects.all()
+    permission_classes = [AllowAny]  # Allow anonymous users to view categories
 
     @extend_schema(responses=CategorySerializer)
     def list(self, request):
@@ -77,7 +78,7 @@ class CategoryListViewSet(viewsets.ViewSet):
 
 class ServerListViewSet(viewsets.ViewSet):
     queryset = Server.objects.all()
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Allow anonymous users to browse servers
 
     @server_list_docs
     def list(self, request):

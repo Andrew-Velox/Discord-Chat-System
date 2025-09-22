@@ -1,98 +1,101 @@
-import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
-import { useAuthServiceContext } from "../context/AuthContext";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { useState } from 'react';
+import { 
+  Container, 
+  Paper, 
+  TextField, 
+  Button, 
+  Typography, 
+  Box, 
+  Alert 
+} from '@mui/material';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
-  const { login } = useAuthServiceContext();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const formik = useFormik({
-    initialValues: {
-      username: "",
-      password: "",
-    },
-    validate: (values) => {
-      const errors: Partial<typeof values> = {};
-      if (!values.username) {
-        errors.username = "Required";
-      }
-      if (!values.password) {
-        errors.password = "Required";
-      }
-      return errors;
-    },
-    onSubmit: async (values) => {
-      const { username, password } = values;
-      const status = await login(username, password);
-      if (status === 401) {
-        formik.setErrors({
-          username: "Invalid username or password",
-          password: "Invalid username or password",
-        });
-      } else if (status === 200) {
-        navigate("/");
-      } else {
-        formik.setErrors({
-          username: "Login failed. Please try again.",
-          password: "Login failed. Please try again.",
-        });
-      }
-    },
-  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const success = await login(username, password);
+    
+    if (success) {
+      navigate('/');
+    } else {
+      setError('Invalid username or password');
+    }
+    setLoading(false);
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
           marginTop: 8,
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
-        <Typography
-          variant="h5"
-          noWrap
-          component="h1"
-          sx={{
-            fontWeight: 500,
-            pb: 2,
-          }}
-        >
-          Sign in
-        </Typography>
-        <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            autoFocus
-            fullWidth
-            id="username"
-            name="username"
-            label="username"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            error={!!formik.touched.username && !!formik.errors.username}
-            helperText={formik.touched.username && formik.errors.username}
-          ></TextField>
-          <TextField
-            margin="normal"
-            fullWidth
-            id="password"
-            name="password"
-            type="password"
-            label="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            error={!!formik.touched.password && !!formik.errors.password}
-            helperText={formik.touched.password && formik.errors.password}
-          ></TextField>
-          <Button
-            variant="contained"
-            disableElevation
-            type="submit"
-            sx={{ mt: 1, mb: 2 }}
-          >
-            Next
-          </Button>
-        </Box>
+        <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
+          <Typography component="h1" variant="h4" align="center" gutterBottom>
+            MeowChat
+          </Typography>
+          <Typography component="h2" variant="h6" align="center" color="textSecondary" gutterBottom>
+            Sign In
+          </Typography>
+          
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
+            </Button>
+            <Box textAlign="center">
+              <Link to="/register">
+                Don't have an account? Sign Up
+              </Link>
+            </Box>
+          </Box>
+        </Paper>
       </Box>
     </Container>
   );
