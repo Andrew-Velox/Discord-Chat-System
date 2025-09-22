@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import useAxiosWithJwtInterceptor from "../helpers/jwtinterceptor";
+import axios from "../utils/axios"; // Use main axios with Token auth
 import { BASE_URL } from "../config";
 
 interface IuseServer {
@@ -12,7 +12,6 @@ interface IuseServer {
 }
 
 const useMembership = (): IuseServer => {
-    const jwtAxios = useAxiosWithJwtInterceptor();
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isUserMember, setIsUserMember] = useState(false);
@@ -25,7 +24,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.post(`${BASE_URL}/api/membership/${serverId}/`);
+            await axios.post(`${BASE_URL}/api/membership/${serverId}/`);
             setIsUserMember(true);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
@@ -43,13 +42,13 @@ const useMembership = (): IuseServer => {
         } finally {
             setIsLoading(false);
         }
-    }, [jwtAxios]);
+    }, []);
 
     const leaveServer = useCallback(async (serverId: number): Promise<void> => {
         setIsLoading(true);
         setError(null);
         try {
-            await jwtAxios.delete(`${BASE_URL}/api/membership/${serverId}/remove_member/`);
+            await axios.delete(`${BASE_URL}/api/membership/${serverId}/remove_member/`);
             setIsUserMember(false);
             // Clear cache since membership status changed
             membershipCache.current.delete(serverId);
@@ -59,7 +58,7 @@ const useMembership = (): IuseServer => {
         } finally {
             setIsLoading(false);
         }
-    }, [jwtAxios]);
+    }, []);
 
     const isMember = useCallback(async (serverId: number): Promise<void> => {
         // Check cache first
@@ -74,7 +73,7 @@ const useMembership = (): IuseServer => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await jwtAxios.get(`${BASE_URL}/api/membership/${serverId}/is_member/`);
+            const response = await axios.get(`${BASE_URL}/api/membership/${serverId}/is_member/`);
             const isMemberResult = response.data.is_member;
             setIsUserMember(isMemberResult);
             
@@ -106,7 +105,7 @@ const useMembership = (): IuseServer => {
         } finally {
             setIsLoading(false);
         }
-    }, [jwtAxios, CACHE_DURATION]);
+    }, [CACHE_DURATION]);
 
     return { joinServer, leaveServer, error, isLoading, isMember, isUserMember };
 };

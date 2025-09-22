@@ -28,7 +28,6 @@ axios.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_data');
-      delete axios.defaults.headers.common['Authorization'];
     }
     return Promise.reject(error);
   }

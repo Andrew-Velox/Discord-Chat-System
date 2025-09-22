@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { useAuthServiceContext } from "../context/AuthContext";
-import useAxiosWithInterceptor from "../helpers/jwtinterceptor";
+import axios from "../utils/axios"; // Use main axios with Token auth
 
 const TestLogin = () => {
   const { isLoggedIn, logout } = useAuthServiceContext();
   const [username, setUsername] = useState("");
-  const jwtAxios = useAxiosWithInterceptor();
 
   const getUserDetails = async () => {
     try {
-      const response = await jwtAxios.get(
-        `http://127.0.0.1:8000/api/account/?user_id=1`,
-        { withCredentials: true }
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/account/?user_id=1`
       );
       const userDetails = response.data;
       setUsername(userDetails.username);

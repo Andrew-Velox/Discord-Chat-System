@@ -23,10 +23,7 @@ export function useTokenAuthService(): AuthServiceProps {
         }
         
         try {
-            // Set token in axios header for verification
-            axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-            
-            // Try to verify with Django Token auth
+            // Try to verify with Django Token auth (interceptor will add token)
             await axios.get(`${BASE_URL}/api/auth/verify/`);
             setIsLoggedIn(true);
             setIsLoading(false);
@@ -34,7 +31,7 @@ export function useTokenAuthService(): AuthServiceProps {
         } catch (error: any) {
             // Token is invalid, remove it
             localStorage.removeItem('auth_token');
-            delete axios.defaults.headers.common['Authorization'];
+            localStorage.removeItem('user_data');
             setIsLoggedIn(false);
             setIsLoading(false);
             return false;
@@ -79,9 +76,6 @@ export function useTokenAuthService(): AuthServiceProps {
             const { token, user } = response.data;
             localStorage.setItem('auth_token', token);
             
-            // Set token in axios headers for future requests
-            axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-            
             // Store user data if needed
             localStorage.setItem('user_data', JSON.stringify(user));
             
@@ -118,20 +112,18 @@ export function useTokenAuthService(): AuthServiceProps {
 
     const logout = async () => {
         try {
-            // Call Django logout endpoint
+            // Call Django logout endpoint (interceptor will add token)
             const token = localStorage.getItem('auth_token');
             if (token) {
-                axios.defaults.headers.common['Authorization'] = `Token ${token}`;
                 await axios.post(`${BASE_URL}/api/auth/logout/`);
             }
         } catch (error: any) {
             // Silently handle logout errors - user still gets logged out locally
         }
         
-        // Clear local storage and axios headers
+        // Clear local storage
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');
-        delete axios.defaults.headers.common['Authorization'];
         setIsLoggedIn(false);
         
         // Navigate to login
