@@ -14,18 +14,21 @@ export function useAuthService(): AuthServiceProps {
     const checkAuthStatus = async () => {
         setIsLoading(true);
         
-        // Log current cookies for debugging
-        console.log('🍪 Current document cookies:', document.cookie);
+        // Quick check: if there's no sessionid cookie, don't bother making the request
+        if (!document.cookie.includes('sessionid=')) {
+            setIsLoggedIn(false);
+            setIsLoading(false);
+            return false;
+        }
         
         try {
             // Try to verify with Django session auth - no localStorage needed!
-            const response = await axios.get(`${BASE_URL}/api/auth/verify/`);
-            console.log("Django session authentication successful", response.data);
+            await axios.get(`${BASE_URL}/api/auth/verify/`);
             setIsLoggedIn(true);
             setIsLoading(false);
             return true;
         } catch (error: any) {
-            console.log("Django session authentication failed:", error.response?.status, error.response?.data);
+            // Silently handle auth failures - this is expected when not logged in
             setIsLoggedIn(false);
             setIsLoading(false);
             return false;
@@ -40,23 +43,15 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         setIsLoading(true);
         try {
-            console.log('🍪 Before login cookies:', document.cookie);
-            
-            const response = await axios.post(
+            await axios.post(
                 `${BASE_URL}/api/auth/login/`,
                 { username, password }
             );
             
-            console.log("Login response:", response.data);
-            console.log("Response headers:", response.headers);
-            console.log('🍪 After login cookies:', document.cookie);
-            
             // Django sessions handle everything automatically
             setIsLoggedIn(true);
-            console.log("Login successful with Django sessions");
             return 200;
         } catch (err: any) {
-            console.log("Login failed:", err.response?.status);
             setIsLoggedIn(false);
             return err.response?.status || 500;
         } finally {
@@ -80,10 +75,8 @@ export function useAuthService(): AuthServiceProps {
         // Call Django logout endpoint
         try {
             await axios.post(`${BASE_URL}/api/auth/logout/`);
-            console.log("Django logout successful");
         } catch (error: any) {
-            console.log("Logout endpoint failed:", error.response?.status, error.response?.data);
-            console.log("Continuing with local logout...");
+            // Silently handle logout errors - user still gets logged out locally
         }
         
         // Clear local state
