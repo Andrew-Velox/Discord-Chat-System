@@ -1,4 +1,4 @@
-import useAxiosWithInterceptor from "../helpers/jwtinterceptor";
+import axios from "../utils/axios"; // Use main axios with Token auth
 import { BASE_URL } from "../config";
 import { useState } from 'react';
 
@@ -10,7 +10,6 @@ interface IuseCrud<T> {
 }
 
 const useCrud = <T>(initialData: T[], apiURL: string): IuseCrud<T> => {
-    const jwtAxios = useAxiosWithInterceptor();
     const [dataCRUD, setDataCRUD] = useState<T[]>(initialData);
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +18,7 @@ const useCrud = <T>(initialData: T[], apiURL: string): IuseCrud<T> => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await jwtAxios.get(`${BASE_URL}${apiURL}`);
+            const response = await axios.get(`${BASE_URL}${apiURL}`);
             const data = response.data;
             setDataCRUD(data);
             return data;
