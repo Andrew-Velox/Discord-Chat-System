@@ -246,11 +246,15 @@ SIMPLE_JWT = {
     "JWT_COOKIE_DOMAIN": None,
 }
 
-# CSRF cookies (must match JWT settings for HTTPS)
+# Session cookies (Django's built-in session authentication)
+SESSION_COOKIE_SECURE = not DEBUG                     # HTTPS only in production
+SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"  # Cross-origin for production
+SESSION_COOKIE_HTTPONLY = True                        # Prevent JS access to session
+SESSION_COOKIE_AGE = 30 * 24 * 60 * 60                # 30 days
+SESSION_SAVE_EVERY_REQUEST = True                     # Refresh session on each request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False               # Persist across browser restarts
+
+# CSRF cookies (must match session settings for HTTPS)
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
 CSRF_COOKIE_HTTPONLY = False   # CSRF cookie must be readable by JS
-
-# Session cookies (for consistency)
-SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"

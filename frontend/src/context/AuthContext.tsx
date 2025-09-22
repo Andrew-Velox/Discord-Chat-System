@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import type { AuthServiceProps } from "../@types/auth-service";
-import { useAuthService } from "../services/AuthServices";
+import { useAuthService } from "../services/SimpleAuthService"; // Use simple Django auth
 
 const AuthServiceContext = createContext<AuthServiceProps | null>(null);
 
