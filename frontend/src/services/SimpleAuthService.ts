@@ -37,7 +37,7 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.post(
+            await axios.post(
                 `${BASE_URL}/api/auth/login/`,
                 { username, password }
             );
