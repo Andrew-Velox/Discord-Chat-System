@@ -71,7 +71,7 @@ ROOT_URLCONF = "meowchat.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -135,6 +135,13 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "static/"
+
+# Additional directories for static files
+STATICFILES_DIRS = [
+    # React build static files
+    os.path.join(BASE_DIR.parent, "frontend", "build", "static"),
+]
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "media/"
 
@@ -166,15 +173,16 @@ SPECTACULAR_SETTINGS = {
 
 CORS_ALLOW_CREDENTIALS = True
 
-# ✅ Only allow your frontend origin (Vercel). Do NOT add your backend domain here.
+# ✅ Allow same-origin requests since frontend and backend are on same domain
 CORS_ALLOWED_ORIGINS = [
-    "https://discord-chat-system.vercel.app",
+    "https://discord-chat-system.onrender.com",
 ]
 
 # For localhost dev
 if DEBUG:
     CORS_ALLOWED_ORIGINS += [
-        "http://localhost:5173",
+        "http://localhost:3000",  # React dev server
+        "http://localhost:5173",  # Vite dev server
         "http://localhost:5174",
         "http://localhost:8000",
     ]

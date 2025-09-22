@@ -13,7 +13,8 @@ from account.simple_auth import simple_login, simple_logout, simple_verify, simp
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from server.views import CategoryListViewSet, ServerListViewSet, ServerMemebershipViewSet, cors_test
@@ -53,6 +54,11 @@ urlpatterns = [
     
     path("api/cors-test/", cors_test, name="cors_test"),
 ] + router.urls
+
+# Serve React app for all non-API routes (catch-all)
+urlpatterns += [
+    re_path(r'^(?!api|admin|ws).*$', TemplateView.as_view(template_name='index.html'), name='react_app'),
+]
 
 websocket_urlpatterns = [path("ws/<str:serverId>/<str:channelId>", WebChatConsumer.as_asgi())]
 
