@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from "react";
 import type { AuthServiceProps } from "../@types/auth-service";
-import { useAuthService } from "../services/SimpleAuthService"; // Use simple Django auth
+import { useTokenAuthService } from "../services/TokenAuthService"; // Use Token authentication
 
 const AuthServiceContext = createContext<AuthServiceProps | null>(null);
 
 export function AuthServiceProvider(props: React.PropsWithChildren<{}>) {
-  const authServices = useAuthService();
+  const authServices = useTokenAuthService();
   return (
     <AuthServiceContext.Provider value={authServices}>
       {props.children}

@@ -1,7 +1,7 @@
 import useWebSocket from "react-use-websocket";
 import { useState } from "react";
 import { WS_ROOT } from "../config";
-import { useAuthService } from "../services/SimpleAuthService"; // Use simple Django auth
+import { useAuthServiceContext } from "../context/AuthContext"; // Use Token auth context
 import useCrud from "../hooks/useCrud";
 import { useMembershipContext } from "../context/MemberContext";
 
@@ -16,7 +16,7 @@ const useChatWebSocket = (channelId: string, serverId: string) =>{
 
     const [newMessage, setNewMessage] = useState<Message[]>([]);
     const [message, setMessage] = useState("");
-    const { logout, refreshAccessToken } = useAuthService();
+    const { logout, refreshAccessToken } = useAuthServiceContext();
     const { isMember } = useMembershipContext();
     const { fetchData } = useCrud<Message>(
       [],

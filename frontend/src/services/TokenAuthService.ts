@@ -95,19 +95,16 @@ export function useTokenAuthService(): AuthServiceProps {
         }
     };
 
-    const register = async (username: string, password: string, confirmPassword?: string, firstName?: string, lastName?: string) => {
+    const register = async (username: string, password: string) => {
         try {
-            const payload: any = { username, password };
-            
-            if (confirmPassword !== undefined) {
-                payload.confirm_password = confirmPassword;
-            }
-            if (firstName !== undefined) {
-                payload.first_name = firstName;
-            }
-            if (lastName !== undefined) {
-                payload.last_name = lastName;
-            }
+            // Use simple registration format to match frontend expectations
+            const payload = { 
+                username, 
+                password, 
+                confirm_password: password,  // Auto-confirm for simple registration
+                first_name: "",
+                last_name: ""
+            };
 
             await axios.post(
                 `${BASE_URL}/api/auth/register/`,
