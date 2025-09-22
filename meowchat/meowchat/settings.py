@@ -27,6 +27,12 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",") if os.environ.ge
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 SECURE_REFERRER_POLICY = "same-origin"
 
+# Additional HTTPS security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = False  # Render handles SSL termination
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_TLS = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    "meowchat.middleware.SecureProxyMiddleware",  # Add HTTPS detection for proxies
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -224,22 +231,26 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
+    "BLACKLIST_AFTER_ROTATION": False,  # Disable to prevent refresh issues
 
     # Cookie names
     "ACCESS_TOKEN_NAME": "access_token",
     "REFRESH_TOKEN_NAME": "refresh_token",
 
-    # Cookie security
-    "JWT_COOKIE_SECURE": not DEBUG,                # True on HTTPS
-    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",
+    # Cookie security - CRITICAL for HTTPS
+    "JWT_COOKIE_SECURE": not DEBUG,                # True on HTTPS, False on HTTP
+    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # "None" required for cross-origin HTTPS
     "JWT_COOKIE_HTTPONLY": True,
 
     # Let browser decide domain (no hardcoding)
     "JWT_COOKIE_DOMAIN": None,
 }
 
-# CSRF cookies (must match JWT settings)
+# CSRF cookies (must match JWT settings for HTTPS)
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
 CSRF_COOKIE_HTTPONLY = False   # CSRF cookie must be readable by JS
+
+# Session cookies (for consistency)
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"

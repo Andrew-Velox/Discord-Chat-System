@@ -106,6 +106,11 @@ class JWTSetCookieMixin:
             # Only add domain if explicitly set (removed for cross-origin dev)
             if settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
                 cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
+            
+            # Debug logging for cookie settings
+            logger.info(f"Setting refresh cookie with kwargs: {cookie_kwargs}")
+            logger.info(f"Request is_secure: {request.is_secure()}")
+            logger.info(f"DEBUG mode: {settings.DEBUG}")
                 
             response.set_cookie(
                 settings.SIMPLE_JWT["REFRESH_TOKEN_NAME"],
@@ -125,6 +130,9 @@ class JWTSetCookieMixin:
             # Only add domain if explicitly set (removed for cross-origin dev)
             if settings.SIMPLE_JWT.get("JWT_COOKIE_DOMAIN"):
                 cookie_kwargs["domain"] = settings.SIMPLE_JWT["JWT_COOKIE_DOMAIN"]
+            
+            # Debug logging for cookie settings
+            logger.info(f"Setting access cookie with kwargs: {cookie_kwargs}")
                 
             response.set_cookie(
                 settings.SIMPLE_JWT["ACCESS_TOKEN_NAME"],
