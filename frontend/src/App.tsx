@@ -12,6 +12,8 @@ import { MembershipProvider } from "./context/MemberContext";
 import MembershipCheck from "./components/Membership/MembershipCheck";
 // Import axios configuration to ensure all requests include credentials
 import "./utils/axios";
+// Import auth debug utility for troubleshooting
+import "./utils/authDebug";
 
 const App = () => {
   return (
