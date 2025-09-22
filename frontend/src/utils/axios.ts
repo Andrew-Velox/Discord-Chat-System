@@ -1,12 +1,16 @@
 import axios from 'axios';
 
 // Configure axios defaults for all requests
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = false; // Don't need cookies for Token auth
 
-// Request interceptor to ensure credentials are always sent
+// Request interceptor to add auth token to headers
 axios.interceptors.request.use(
   (config) => {
-    config.withCredentials = true;
+    // Get token from localStorage and add to headers
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Token ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -20,7 +24,12 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Silently handle auth errors - don't log them
+    // If we get a 401, the token is invalid - clear it
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      delete axios.defaults.headers.common['Authorization'];
+    }
     return Promise.reject(error);
   }
 );

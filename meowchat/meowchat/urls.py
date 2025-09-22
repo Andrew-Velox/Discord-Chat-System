@@ -1,10 +1,14 @@
 from account.views import (
     AccountViewSet,
+    UserRegistrationApiView,
+    UserLoginApiView, 
+    UserLogoutApiView,
+    VerifyAuthAPIView,
+    # Legacy views for backwards compatibility
     LogOutAPIView,
     RegisterView,
-    VerifyAuthAPIView,
 )
-# Import simple authentication views
+# Import simple authentication views for backwards compatibility
 from account.simple_auth import simple_login, simple_logout, simple_verify, simple_register
 from django.conf import settings
 from django.conf.urls.static import static
@@ -31,14 +35,19 @@ urlpatterns = [
     path("api/docs/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/schema/ui/", SpectacularSwaggerView.as_view()),
     
-    # Simple Django session-based authentication (NEW - reliable for deployment)
-    # Simple Session Authentication (Primary)
-    path("api/auth/login/", simple_login, name="simple_login"),
-    path("api/auth/logout/", simple_logout, name="simple_logout"), 
-    path("api/auth/verify/", simple_verify, name="simple_verify"),
-    path("api/auth/register/", simple_register, name="simple_register"),
+    # Token-based Authentication (Primary - like e-commerce project)
+    path("api/auth/login/", UserLoginApiView.as_view(), name="user_login"),
+    path("api/auth/logout/", UserLogoutApiView.as_view(), name="user_logout"), 
+    path("api/auth/verify/", VerifyAuthAPIView.as_view(), name="verify_auth"),
+    path("api/auth/register/", UserRegistrationApiView.as_view(), name="user_register"),
     
-    # Legacy endpoints (use session authentication now)
+    # Legacy Session Authentication (backwards compatibility)
+    path("api/session/login/", simple_login, name="simple_login"),
+    path("api/session/logout/", simple_logout, name="simple_logout"), 
+    path("api/session/verify/", simple_verify, name="simple_verify"),
+    path("api/session/register/", simple_register, name="simple_register"),
+    
+    # Other legacy endpoints
     path("api/logout/", LogOutAPIView.as_view(), name="logout"),
     path("api/register/", RegisterView.as_view(), name="register"),
     

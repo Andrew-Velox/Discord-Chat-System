@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # External
     "drf_spectacular",
     "rest_framework",
+    "rest_framework.authtoken",  # Add Token authentication
     "corsheaders",
     "channels",
     # Internal
@@ -147,7 +148,11 @@ AUTH_USER_MODEL = "account.Account"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "account.authentication.CSRFExemptSessionAuthentication",  # Primary session auth only
+        "rest_framework.authentication.TokenAuthentication",  # Primary Token auth
+        "rest_framework.authentication.SessionAuthentication",  # Fallback for admin
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
 
@@ -225,41 +230,5 @@ CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
 }
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": False,  # Disable to prevent refresh issues
-
-    # Cookie names
-    "ACCESS_TOKEN_NAME": "access_token",
-    "REFRESH_TOKEN_NAME": "refresh_token",
-
-    # Cookie security - CRITICAL for HTTPS
-    "JWT_COOKIE_SECURE": not DEBUG,                # True on HTTPS, False on HTTP
-    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # "None" required for cross-origin HTTPS
-    "JWT_COOKIE_HTTPONLY": True,
-
-    # Let browser decide domain (no hardcoding)
-    "JWT_COOKIE_DOMAIN": None,
-}
-
-# Session cookies (Django's built-in session authentication)
-SESSION_COOKIE_NAME = "sessionid"                     # Explicit cookie name
-SESSION_COOKIE_SECURE = not DEBUG                     # HTTPS only in production
-SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"  # Cross-origin for production
-SESSION_COOKIE_HTTPONLY = True                        # Prevent JS access to session
-SESSION_COOKIE_AGE = 30 * 24 * 60 * 60                # 30 days (2592000 seconds)
-SESSION_COOKIE_DOMAIN = None                          # Let browser handle domain
-SESSION_COOKIE_PATH = "/"                             # Available on all paths
-SESSION_SAVE_EVERY_REQUEST = True                     # Refresh session on each request
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False               # CRITICAL: Persist across browser restarts
-SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Use database backend for persistence
-
-# Force Django to set Max-Age attribute on session cookies
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
-
-# CSRF cookies (must match session settings for HTTPS)
-CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
-CSRF_COOKIE_HTTPONLY = False   # CSRF cookie must be readable by JS
+# Token Authentication Settings
+# Tokens don't expire by default, but you can implement custom expiration logic if needed
