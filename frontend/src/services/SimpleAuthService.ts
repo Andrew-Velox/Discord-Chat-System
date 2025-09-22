@@ -35,9 +35,30 @@ export function useAuthService(): AuthServiceProps {
         }
     };
 
-    // Check auth status on component mount
+    // Check auth status on component mount and page visibility change
     useEffect(() => {
         checkAuthStatus();
+        
+        // Re-check auth when page becomes visible (handles refresh/tab switching)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                checkAuthStatus();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Also check on window focus (handles refresh)
+        const handleFocus = () => {
+            checkAuthStatus();
+        };
+        
+        window.addEventListener('focus', handleFocus);
+        
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
     }, []);
 
     const login = async (username: string, password: string) => {
