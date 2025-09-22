@@ -173,9 +173,10 @@ SPECTACULAR_SETTINGS = {
 
 CORS_ALLOW_CREDENTIALS = True
 
-# ✅ Allow same-origin requests since frontend and backend are on same domain
+# ✅ Allow frontend origins (Vercel deployment and same-origin Render)
 CORS_ALLOWED_ORIGINS = [
-    "https://discord-chat-system.onrender.com",
+    "https://discord-chat-system.onrender.com",  # Same domain deployment
+    "https://discord-chat-system.vercel.app",    # Vercel deployment
 ]
 
 # For localhost dev
