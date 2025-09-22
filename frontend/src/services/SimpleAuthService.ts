@@ -14,6 +14,9 @@ export function useAuthService(): AuthServiceProps {
     const checkAuthStatus = async () => {
         setIsLoading(true);
         
+        // Log current cookies for debugging
+        console.log('🍪 Current document cookies:', document.cookie);
+        
         try {
             // Try to verify with Django session auth - no localStorage needed!
             const response = await axios.get(`${BASE_URL}/api/auth/verify/`);
@@ -37,6 +40,8 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         setIsLoading(true);
         try {
+            console.log('🍪 Before login cookies:', document.cookie);
+            
             const response = await axios.post(
                 `${BASE_URL}/api/auth/login/`,
                 { username, password }
@@ -44,6 +49,7 @@ export function useAuthService(): AuthServiceProps {
             
             console.log("Login response:", response.data);
             console.log("Response headers:", response.headers);
+            console.log('🍪 After login cookies:', document.cookie);
             
             // Django sessions handle everything automatically
             setIsLoggedIn(true);
