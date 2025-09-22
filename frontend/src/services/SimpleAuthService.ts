@@ -16,13 +16,13 @@ export function useAuthService(): AuthServiceProps {
         
         try {
             // Try to verify with Django session auth - no localStorage needed!
-            await axios.get(`${BASE_URL}/api/auth/verify/`);
-            console.log("Django session authentication successful");
+            const response = await axios.get(`${BASE_URL}/api/auth/verify/`);
+            console.log("Django session authentication successful", response.data);
             setIsLoggedIn(true);
             setIsLoading(false);
             return true;
         } catch (error: any) {
-            console.log("Django session authentication failed:", error.response?.status);
+            console.log("Django session authentication failed:", error.response?.status, error.response?.data);
             setIsLoggedIn(false);
             setIsLoading(false);
             return false;
@@ -37,10 +37,13 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         setIsLoading(true);
         try {
-            await axios.post(
+            const response = await axios.post(
                 `${BASE_URL}/api/auth/login/`,
                 { username, password }
             );
+            
+            console.log("Login response:", response.data);
+            console.log("Response headers:", response.headers);
             
             // Django sessions handle everything automatically
             setIsLoggedIn(true);
@@ -72,8 +75,9 @@ export function useAuthService(): AuthServiceProps {
         try {
             await axios.post(`${BASE_URL}/api/auth/logout/`);
             console.log("Django logout successful");
-        } catch (error) {
-            console.log("Logout endpoint failed, but logging out locally");
+        } catch (error: any) {
+            console.log("Logout endpoint failed:", error.response?.status, error.response?.data);
+            console.log("Continuing with local logout...");
         }
         
         // Clear local state
