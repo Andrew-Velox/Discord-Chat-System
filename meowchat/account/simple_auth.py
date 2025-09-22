@@ -82,6 +82,7 @@ def simple_logout(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt  # Allow cross-origin requests without CSRF token
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def simple_verify(request):
