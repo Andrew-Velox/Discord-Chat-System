@@ -58,7 +58,6 @@ MIDDLEWARE = [
     "meowchat.middleware.SecureProxyMiddleware",  # Add HTTPS detection for proxies
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "meowchat.middleware.SessionCookieMiddleware",  # Ensure proper session cookie attributes
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -257,6 +256,9 @@ SESSION_COOKIE_PATH = "/"                             # Available on all paths
 SESSION_SAVE_EVERY_REQUEST = True                     # Refresh session on each request
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False               # CRITICAL: Persist across browser restarts
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Use database backend for persistence
+
+# Force Django to set Max-Age attribute on session cookies
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 
 # CSRF cookies (must match session settings for HTTPS)
 CSRF_COOKIE_SECURE = not DEBUG
