@@ -28,36 +28,36 @@ const Dashboard = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, logout } = useAuth();
 
-  const fetchData = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      const [serversResponse, categoriesResponse] = await Promise.all([
-        api.get('/api/server/select/'),
-        api.get('/api/server/category/')
-      ]);
-      
-      setServers(serversResponse.data);
-      setCategories(categoriesResponse.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      // If there's an auth error, the api interceptor will handle redirect
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const [serversResponse, categoriesResponse] = await Promise.all([
+          api.get('/api/server/select/'),
+          api.get('/api/server/category/')
+        ]);
+        
+        setServers(serversResponse.data);
+        setCategories(categoriesResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // If there's an auth error, the api interceptor will handle redirect
+      } finally {
+        setLoading(false);
+      }
+    };
+
     // Only fetch data if user is authenticated
     if (user) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [user]); // Remove fetchData from dependencies to avoid infinite loop
+  }, [user]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
